@@ -14,6 +14,8 @@ import {
   ViroARSceneNavigator
 } from 'react-viro';
 
+import ButtonComponent from './js/Component/ButtonComponent';
+
 var sharedProps = {
   apiKey:"A96217A2-0EA6-4173-803C-ACCF333CB9F6",
 }
@@ -42,6 +44,7 @@ export default class App extends Component{
         <View style={styles.centerTextView}>
           <Text style={styles.centerText}> {this.state.centerText}</Text>
         </View>
+        {this._buttonComponents()}
       </View>
     );
   }
@@ -57,17 +60,32 @@ export default class App extends Component{
   }
 
   _overlayView(){
-    console.log("aaa")
     return(
-        <View style={styles.crosshair}/>
-    )
+          <View style={styles.crosshair}/>
+          )
   }
 
   _changeHoverText(text){
-    console.log(this)
     this.setState({
       centerText : text,
     })
+  }
+
+  _buttonComponents(){
+    return(
+      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:70, width:70, height:160, flex:1}}>
+        <ButtonComponent key="button_models"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
+            style={styles.screenIcon} selected={true}
+        />
+        <ButtonComponent key="button_models"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
+            style={styles.screenIcon} selected={true}
+        />
+      </View>
+    )
   }
 }
 
@@ -91,6 +109,21 @@ const styles = StyleSheet.create({
     color: 'grey',
     fontWeight: 'bold',
     fontSize: 15,
+  },
+  centerTextView: {
+    position: 'absolute',
+    top: (Dimensions.get('window').height / 2),
+    left: (Dimensions.get('window').width / 2),
+  },
+  centerText: {
+    color: 'grey',
+    fontWeight: 'bold',
+    fontSize: 15,
+  },
+  screenIcon: {
+    position : 'absolute',
+    height: 58,
+    width: 58,
   },
 });
 

@@ -34,20 +34,17 @@ export default class ARMedicalView extends Component {
     }
 
     render() {
-        console.log(this.props)
         return (
           <ViroARScene ref={(component)=>{this.sceneRef = component}} displayPointCloud={true}>
             <ViroAmbientLight color="#ffffff" />
-            <ViroARPlane>
+            <ViroARPlaneSelector>
             <ViroImage
-                height={.05}
-                width={.05}
-                source={require("./res/cross.png")}
-                position={[0,0.1,0]}
+                height={.1}
+                width={.1}
+                source={require("./res/floor.jpg")}
+                position={[0,0.0,0]}
                 rotation={[270,0,0]}
               />
-            </ViroARPlane>
-            <ViroARImageMarker target={"logo"}>
             <Viro3DObject
               source={require('./res/man/00079_Nash002_Basics_Free.obj')}
               resources={[
@@ -57,12 +54,24 @@ export default class ARMedicalView extends Component {
               scale={[0.0025,0.0025,0.0025]}
               type='OBJ'
               ref={ "person"}
-              onHover={(a)=> this._onHover(a, "person")}
+              ignoreEventHandling={true}
               />
-            </ViroARImageMarker>
+              {this._headHitbox()}
+            </ViroARPlaneSelector>
 
           </ViroARScene>
         );
+    }
+
+    _headHitbox(){
+      return(
+      <ViroBox
+                scale={[0.025,0.025,0.025]}
+                position={[-0.01,0.16,0]}
+                onHover={(a)=> this._onHover(a, "Cabeça")}
+                opacity={1}
+                ></ViroBox>
+        )
     }
 
     _onHover(isHovering, elemento){
