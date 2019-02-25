@@ -123,7 +123,7 @@ class ButtonComponent extends Component {
 }
 
 ButtonComponent.propTypes = {
-        onPress: PropTypes.func.isRequired,
+        // onPress: PropTypes.func.isRequired,
         buttonState: PropTypes.oneOf(['on', 'off']).isRequired,
         stateImageArray: PropTypes.array.isRequired,
         style: PropTypes.any,

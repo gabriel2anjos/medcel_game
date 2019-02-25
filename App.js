@@ -74,12 +74,12 @@ export default class App extends Component{
   _buttonComponents(){
     return(
       <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:70, width:70, height:160, flex:1}}>
-        <ButtonComponent key="button_models"
+        <ButtonComponent key="button1"
             buttonState={'off'}
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
         />
-        <ButtonComponent key="button_models"
+        <ButtonComponent key="button2"
             buttonState={'off'}
             stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}

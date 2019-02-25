@@ -19,6 +19,7 @@ import {
   ViroText,
   ViroARPlaneSelector,
   ViroNode,
+  ViroSpotLight
 } from 'react-viro';
 
 export default class ARMedicalView extends Component {
@@ -36,7 +37,7 @@ export default class ARMedicalView extends Component {
     render() {
         return (
           <ViroARScene ref={(component)=>{this.sceneRef = component}} displayPointCloud={true}>
-            <ViroAmbientLight color="#ffffff" />
+          <ViroAmbientLight color="#ffffff" intensity={200}/>
             <ViroARPlaneSelector>
             <ViroImage
                 height={.1}
@@ -45,17 +46,18 @@ export default class ARMedicalView extends Component {
                 position={[0,0.0,0]}
                 rotation={[270,0,0]}
               />
-            <Viro3DObject
-              source={require('./res/man/00079_Nash002_Basics_Free.obj')}
+              <Viro3DObject
+              source={require('./res/eric/MyCharacter.vrx')}
               resources={[
-                require('./res/man/00079_Nash002_Basics_Free.mtl'),
-                require('./res/man/00079_Nash002_Diffuse.jpg'),
+                require('./res/eric/MyCharacter_color.jpg'),
               ]}
               scale={[0.0025,0.0025,0.0025]}
-              type='OBJ'
+              type='VRX'
               ref={ "person"}
               ignoreEventHandling={true}
+              materials={"pbr"}
               />
+              <ViroAmbientLight color="#ffffff" />
               {this._headHitbox()}
             </ViroARPlaneSelector>
 
@@ -83,6 +85,12 @@ export default class ARMedicalView extends Component {
         }
     }
 }
+
+ViroMaterials.createMaterials({
+  pbr: {
+    lightingModel: "PBR",
+  },
+});
 
 ViroARTrackingTargets.createTargets({
     logo : {
