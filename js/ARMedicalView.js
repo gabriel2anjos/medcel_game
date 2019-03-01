@@ -1,8 +1,9 @@
 'use strict';
 
 import React, { Component } from 'react';
-
 import {StyleSheet} from 'react-native';
+
+import HitboxObject from './Component/HitboxObject';
 
 import {
   ViroARScene,
@@ -36,11 +37,13 @@ export default class ARMedicalView extends Component {
         };
 
         this._onHover = this._onHover.bind(this)
+        this._onCollision = this._onCollision.bind(this)
+        this._onCollision();
     }
 
     render() {
         return (
-          <ViroARScene ref={(component)=>{this.sceneRef = component}} displayPointCloud={true} >
+          <ViroARScene ref={(component)=>{this.cameraRef = component}} displayPointCloud={true} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} onClick={this._onCollision}>
           <ViroAmbientLight color="#ffffff" intensity={200}/>
             {/* <ViroARPlaneSelector> */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
@@ -78,16 +81,57 @@ export default class ARMedicalView extends Component {
 
     _headHitbox(){
       return(
-      <ViroBox
-                scale={[0.025,0.025,0.025]}
-                position={[-0.01,0.16,0]}
-                onHover={(a)=> this._onHover(a, "Cabeça")}
-                opacity={1}
-                ></ViroBox>
+        <ViroNode>
+          <HitboxObject
+            scale={[0.05,0.05,0.05]}
+            position={[-0.01,0.36,0]}
+            name={"Cabeça"}
+            onCollision={(a, name)=> this._onHover(a, name)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.3,0.01]}
+            name={"Torax"}
+            onCollision={(a)=> this._onHover(a, name)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.3,-0.01]}
+            name={"Costas superior"}
+            onCollision={(a)=> this._onHover(a, name)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.23,0.01]}
+            name={"Abdome"}
+            onCollision={(a)=> this._onHover(a, name)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.23,-0.01]}
+            name={"Costas inferior"}
+            onCollision={(a)=> this._onHover(a, name)}
+          />
+
+        </ViroNode>
         )
     }
 
+    _onCollision(){
+      setInterval(() => {
+      if (this.cameraRef) {
+        this.cameraRef.getCameraOrientationAsync().then(orientation=>{
+            const from = orientation.position;
+            const to = [orientation.forward[0]*100,orientation.forward[1]*100,orientation.forward[2]*100];
+            this.cameraRef.findCollisionsWithRayAsync(from, to, true, 'shoot')
+        }
+
+        )
+      }}, 250)
+    }
+
     _onHover(isHovering, elemento){
+      console.log(isHovering, elemento)
         if (isHovering){
             this.props.arSceneNavigator.viroAppProps.changeHoverText(elemento);
         }
