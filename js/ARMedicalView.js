@@ -54,6 +54,14 @@ export default class ARMedicalView extends Component {
                 {/* <ViroText style={styles.prodTitleText} position={[0.2, 0.7, -0.1]} rotation={[0, 0, 0]} text="AAAAA" width={.32} height={.0325} /> */}
                 <ViroText style={styles.prodDescriptionText} position={[0, 0.42, 0]} width={0.1} height={0.1} scale={[.05, .05, .05]} fontWeight='100' text="Estou com dor na perna" />
               {/* </ViroFlexView> */}
+              <ViroImage
+                height={.80}
+                width={.80}
+                source={require("./res/chatbaloon.png")}
+                position={[0.1,0.41,0]}
+                scale={[0.3,0.2,0.3]}
+                rotation={[0,0,0]}
+              />
               <Viro3DObject
               source={require('./res/eric/Idle.vrx')}
               resources={[
