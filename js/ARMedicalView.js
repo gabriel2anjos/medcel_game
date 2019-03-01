@@ -13,16 +13,11 @@ import {
   ViroMaterials,
   Viro3DObject,
   ViroImage,
-  ViroUtils,
-  ViroARPlane,
   ViroAmbientLight,
-  ViroBox,
   ViroText,
-  ViroARPlaneSelector,
   ViroNode,
-  ViroSpotLight,
-  ViroFlexView
 } from 'react-viro';
+
 
 export default class ARMedicalView extends Component {
 
@@ -92,25 +87,25 @@ export default class ARMedicalView extends Component {
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,0.01]}
             name={"Torax"}
-            onCollision={(a)=> this._onHover(a, name)}
+            onCollision={(a, name)=> this._onHover(a, name)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,-0.01]}
             name={"Costas superior"}
-            onCollision={(a)=> this._onHover(a, name)}
+            onCollision={(a, name)=> this._onHover(a, name)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,0.01]}
             name={"Abdome"}
-            onCollision={(a)=> this._onHover(a, name)}
+            onCollision={(a, name)=> this._onHover(a, name)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,-0.01]}
             name={"Costas inferior"}
-            onCollision={(a)=> this._onHover(a, name)}
+            onCollision={(a, name)=> this._onHover(a, name)}
           />
 
         </ViroNode>
@@ -131,7 +126,6 @@ export default class ARMedicalView extends Component {
     }
 
     _onHover(isHovering, elemento){
-      console.log(isHovering, elemento)
         if (isHovering){
             this.props.arSceneNavigator.viroAppProps.changeHoverText(elemento);
         }

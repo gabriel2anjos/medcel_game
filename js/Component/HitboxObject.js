@@ -1,29 +1,8 @@
 import React, { Component } from 'react';
-import {StyleSheet,
-        TouchableHighlight,
-        Animated,
-        Easing,
-        Image,
-        View,
-        } from 'react-native';
 import PropTypes from 'prop-types';
 
 import {
-    ViroARScene,
-    ViroConstants,
-    ViroARTrackingTargets,
-    ViroARImageMarker,
-    ViroMaterials,
-    Viro3DObject,
-    ViroImage,
-    ViroUtils,
-    ViroARPlane,
-    ViroAmbientLight,
     ViroBox,
-    ViroText,
-    ViroARPlaneSelector,
-    ViroNode,
-    ViroSpotLight,
     ViroFlexView
   } from 'react-viro';
 /**
