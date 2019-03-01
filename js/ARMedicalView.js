@@ -31,9 +31,9 @@ export default class ARMedicalView extends Component {
           loopState:false,
         };
 
-        this._onHover = this._onHover.bind(this)
-        this._onCollision = this._onCollision.bind(this)
-        this._onCollision();
+        this._onHover = this._onHover.bind(this);
+        this._startRay = this._startRay.bind(this);
+        this._onAnchorFound = this._onAnchorFound.bind(this);
     }
 
     render() {
@@ -112,7 +112,7 @@ export default class ARMedicalView extends Component {
         )
     }
 
-    _onCollision(){
+    _startRay(){
       setInterval(() => {
       if (this.cameraRef) {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
@@ -132,6 +132,10 @@ export default class ARMedicalView extends Component {
         else{
             this.props.arSceneNavigator.viroAppProps.changeHoverText("");
         }
+    }
+
+    _onAnchorFound(){
+      this._startRay()
     }
 
 }
