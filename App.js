@@ -17,6 +17,7 @@ import {
 import ButtonComponent from './js/Component/ButtonComponent';
 
 
+
 var sharedProps = {
   apiKey:"A96217A2-0EA6-4173-803C-ACCF333CB9F6",
 }
@@ -37,6 +38,7 @@ export default class App extends Component{
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
     this._changeHoverText = this._changeHoverText.bind(this);
+    this._ARView = React.createRef()
   }
 
   render() {
@@ -58,6 +60,7 @@ export default class App extends Component{
             style ={{flex:1}}
             initialScene={{scene: InitialARScene}}
             viroAppProps={this.state.viroAppProps}
+            ref={this._ARView}
       />
     )
   }
@@ -76,16 +79,24 @@ export default class App extends Component{
 
   _buttonComponents(){
     return(
-      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:70, width:70, height:160, flex:1}}>
+      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:70, width:70, height:160, flex:1}}>
         <ButtonComponent key="button1"
             buttonState={'off'}
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              console.log(this._ARView.current)
+              this._ARView.setState({
+              dialog: "Apertou",
+              dialogVisible : true,
+            })
+          }}
         />
         <ButtonComponent key="button2"
             buttonState={'off'}
             stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
+            onPress={()=>{console.log("abc")}}
         />
       </View>
     )

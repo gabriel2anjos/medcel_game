@@ -24,4 +24,4 @@ newmtl Reflection_Chrome1
 	Kd 0.4863 0.4863 0.4863
 	Ks 0.8100 0.8100 0.8100
 	Ke 0.0000 0.0000 0.0000
-	map_refl C:\Program Files (x86)\Autodesk\3ds Max 2011\maps\Reflection\Chrmwarp.jpg
+	map_refl Chrmwarp.jpg

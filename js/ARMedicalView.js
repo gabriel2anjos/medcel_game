@@ -16,7 +16,9 @@ import {
   ViroAmbientLight,
   ViroText,
   ViroNode,
-  ViroARPlaneSelector
+  ViroARPlaneSelector,
+  ViroFlexView,
+  ViroOmniLight
 } from 'react-viro';
 
 
@@ -30,6 +32,8 @@ export default class ARMedicalView extends Component {
           animationName:"mixamo.com",
           modelAnim: false,
           loopState:false,
+          dialog: "Estou com dor de cabeça",
+          dialogVisible : true,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -40,7 +44,11 @@ export default class ARMedicalView extends Component {
     render() {
         return (
           <ViroARScene ref={(component)=>{this.cameraRef = component}} displayPointCloud={true} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} onClick={this._onCollision}>
-          <ViroAmbientLight color="#ffffff" intensity={200}/>
+          <ViroNode scale={[1,1,1]} >
+          <ViroAmbientLight
+              color="#ffffff"
+          />
+            
             {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound}> */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
             <ViroNode>
@@ -53,51 +61,118 @@ export default class ARMedicalView extends Component {
               />
               {/* <ViroFlexView style={styles.titleContainer} position={[0.2, 0.4, -0.1]} rotation={[0, 0, 0]} height={.13} width={.32}> */}
                 {/* <ViroText style={styles.prodTitleText} position={[0.2, 0.7, -0.1]} rotation={[0, 0, 0]} text="AAAAA" width={.32} height={.0325} /> */}
-                <ViroText style={styles.prodDescriptionText} position={[0, 0.42, 0]} width={0.1} height={0.1} scale={[.05, .05, .05]} fontWeight='100' text="Estou com dor na perna" />
-              {/* </ViroFlexView> */}
-              <ViroImage
-                height={.80}
-                width={.80}
-                source={require("./res/chatbaloon.png")}
-                position={[0.1,0.41,0]}
-                scale={[0.3,0.2,0.3]}
-                rotation={[0,0,0]}
-              />
-              <Viro3DObject
-              source={require('./res/eric/Idle.vrx')}
+                <ViroFlexView style={styles.cardWrapper} 
+                              width={5} height={1.5} 
+                              position={[0.1, 0.39, -0.0]}
+                              rotation={[0, 0, 0]}
+                              scale={[0.03,0.03,0.03]}
+                              visible={this.state.dialogVisible}>
+                              <ViroText style={styles.prodDescriptionText} textAlign="left"  fontWeight='100' text={this.state.dialog} />
+                </ViroFlexView>
+              {this._renderIdle()}
+              {this._renderResting()}
+              {this._renderSitting()}
+              {this._renderHitBoxesIdle()}
+            {/* </ViroARPlaneSelector> */}
+            </ViroNode>
+              </ViroARImageMarker>
+              <ViroARImageMarker target={"logo_v"}>
+            <ViroNode>
+            <Viro3DObject source={require('./res/heart/heart.obj')}
+                        position={[0,0.2,0]}
+                        scale={[0.3,0.3,0.3]}
+                       materials={["heart"]} type="OBJ" />
+            </ViroNode>
+              </ViroARImageMarker>
+              </ViroNode>
+          </ViroARScene>
+        );
+    }
+    _renderResting(){
+      const pos = [0,0,0];
+      return(
+        <ViroNode>
+            <Viro3DObject
+              source={require('./res/folding_bed/Folding_Bed.obj')}
               resources={[
-                require('./res/eric/paciente_color.jpg'),
+                require('./res/folding_bed/Folding_Bed.mtl'),
+                require('./res/folding_bed/Chrmwarp.jpg')
               ]}
-              scale={[0.0022,0.0022,0.0022]}
-              type='VRX'
+              scale={[0.0037,0.0037,0.0037]}
+              position={[0.4,0,0.14]}
+              type='OBJ'
               ref={ "person"}
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
-              <Viro3DObject
+            <Viro3DObject
               source={require('./res/eric/idlelay.vrx')}
               resources={[
                 require('./res/eric/paciente_color.jpg'),
               ]}
               scale={[0.0022,0.0022,0.0022]}
-              position={[1,0,0]}
+              position={[0.4,0,0]}
               type='VRX'
               ref={ "person"}
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
-              <ViroAmbientLight color="#ffffff" />
-              {this._headHitbox()}
-            {/* </ViroARPlaneSelector> */}
-            </ViroNode>
-              </ViroARImageMarker>
-          </ViroARScene>
-        );
+        </ViroNode>
+      )
+    }
+    _renderSitting(){
+      const pos = [-0.3,0,0];
+      return(
+        <ViroNode>
+            <Viro3DObject
+              source={require('./res/eric/idlesit.vrx')}
+              resources={[
+                require('./res/eric/paciente_color.jpg'),
+              ]}
+              scale={[0.0022,0.0022,0.0022]}
+              position={[pos[0] + -0.0,pos[1] + 0,pos[2] + 0]}
+              type='VRX'
+              ref={ "person"}
+              ignoreEventHandling={true}
+              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
+              materials={"pbr"}
+            />
+            <Viro3DObject
+              source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
+              resources={[
+                require('./res/chair/cattelan_italia_cindy_obj.mtl'),
+              ]}
+              scale={[0.0022,0.0022,0.0022]}
+              rotation={[0,0,0]}
+              position={[pos[0]+ -0.0,pos[1]+ -.02,pos[2]+ -0.0]}
+              type='OBJ'
+            />
+        </ViroNode>
+      )
+    }
+    _renderIdle(){
+      return(
+        <ViroNode>
+            <Viro3DObject
+          source={require('./res/eric/Idle.vrx')}
+          resources={[
+            require('./res/eric/paciente_color.jpg'),
+          ]}
+          scale={[0.0022,0.0022,0.0022]}
+          type='VRX'
+          ref={ "person"}
+          ignoreEventHandling={true}
+          animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
+          materials={"pbr"}
+          />
+        </ViroNode>
+
+      )
     }
 
-    _headHitbox(){
+    _renderHitBoxesIdle(){
       return(
         <ViroNode>
           <HitboxObject
@@ -148,12 +223,11 @@ export default class ARMedicalView extends Component {
 
     _startRay(){
       setInterval(() => {
-        console.log("rodou")
       if (this.cameraRef) {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
             const from = orientation.position;
             const to = [orientation.forward[0]*100,orientation.forward[1]*100,orientation.forward[2]*100];
-            this.cameraRef.findCollisionsWithRayAsync(from, to, true, 'shoot')
+            this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>collision?null:this._onHover(false))
         }
 
         )
@@ -179,6 +253,13 @@ ViroMaterials.createMaterials({
   pbr: {
     lightingModel: "PBR",
   },
+  heart: {
+    lightingModel: "Blinn",
+    diffuseTexture: require('./res/heart/Heart_D3.jpg'),
+    specularTexture: require('./res/heart/Heart_S2.jpg'),
+    writesToDepthBuffer: true,
+    readsFromDepthBuffer: true,
+  },
 });
 
 ViroARTrackingTargets.createTargets({
@@ -186,14 +267,19 @@ ViroARTrackingTargets.createTargets({
       source : require('./res/qrcode.png'),
       orientation : "Up",
       physicalWidth : 0.165 // real world width in meters
-    }
+    },
+    logo_v : {
+      source : require('./res/logo_v.png'),
+      orientation : "Up",
+      physicalWidth : 0.125 // real world width in meters
+    },
   });
 
 var styles = StyleSheet.create({
   prodDescriptionText: {
     fontFamily: 'sans-serif-light',
-    fontSize: 20,
-    color: 'red',
+    fontSize: 30,
+    color: 'black',
     textAlignVertical: 'center',
     textAlign: 'left',
     flex: 1,
@@ -206,9 +292,14 @@ var styles = StyleSheet.create({
   prodTitleText: {
     fontFamily: 'sans-serif-light',
     fontSize: 30,
-    color: '#222222',
+    color: '#000000',
     textAlignVertical: 'center',
     textAlign: 'left',
+  },
+  cardWrapper: {
+    flexDirection: 'row',
+    backgroundColor: "#ffffff",
+    padding: .1,
   },
 });
   

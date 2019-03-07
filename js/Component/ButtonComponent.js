@@ -20,6 +20,7 @@ import {StyleSheet,
 import PropTypes from 'prop-types';
 
 
+
 /**
  * A 2D UI "on glass" button, standard React Native component. Class encapsulating states, animations, and other details for a Buttons in the app. 
  * Used for selecting Portals, Effects, Objects on the left of the screen above listview
@@ -33,7 +34,6 @@ class ButtonComponent extends Component {
     this.scale = this.scale.bind(this);
     this._onPress = this._onPress.bind(this);
     this.crossFade = this.crossFade.bind(this);
-
     var imgSource = this.props.stateImageArray[0];
 
     this.buttonScale = this.scaleValue.interpolate({
@@ -83,9 +83,9 @@ class ButtonComponent extends Component {
   _onPress() {
     if (this.props.buttonState === 'off') {
       this.scale();
+      this.props.onPress();
       // from https://facebook.github.io/react-native/docs/performance.html#my-touchablex-view-isn-t-very-responsive
       requestAnimationFrame(() => {
-        this.props.onPress();   
       });
     }
   }
@@ -128,6 +128,7 @@ ButtonComponent.propTypes = {
         stateImageArray: PropTypes.array.isRequired,
         style: PropTypes.any,
         selected: PropTypes.bool,
+        onPress: PropTypes.func,
 };
 
 export default ButtonComponent;
