@@ -24,7 +24,7 @@ export default class HitboxObject extends Component {
             scale={this.props.scale}
             position={this.props.position}
             onCollision={(a)=> this.props.onCollision(a, this.props.name)}
-            opacity={0}
+            opacity={0.0}
             />
           )
       }
