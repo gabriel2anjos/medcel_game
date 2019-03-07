@@ -42,7 +42,7 @@ export default class ARMedicalView extends Component {
           <ViroAmbientLight color="#ffffff" intensity={200}/>
             {/* <ViroARPlaneSelector> */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
-
+            <ViroNode>
             <ViroImage
                 height={.80}
                 width={.80}
@@ -74,9 +74,23 @@ export default class ARMedicalView extends Component {
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
+              <Viro3DObject
+              source={require('./res/eric/idlelay.vrx')}
+              resources={[
+                require('./res/eric/paciente_color.jpg'),
+              ]}
+              scale={[0.0022,0.0022,0.0022]}
+              position={[1,0,0]}
+              type='VRX'
+              ref={ "person"}
+              ignoreEventHandling={true}
+              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
+              materials={"pbr"}
+              />
               <ViroAmbientLight color="#ffffff" />
               {this._headHitbox()}
             {/* </ViroARPlaneSelector> */}
+            </ViroNode>
               </ViroARImageMarker>
           </ViroARScene>
         );
