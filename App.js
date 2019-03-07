@@ -16,6 +16,7 @@ import {
 
 import ButtonComponent from './js/Component/ButtonComponent';
 
+
 var sharedProps = {
   apiKey:"A96217A2-0EA6-4173-803C-ACCF333CB9F6",
 }
@@ -28,7 +29,9 @@ export default class App extends Component{
     super(props);
     this.state = {
       sharedProps : sharedProps,
-      viroAppProps : {changeHoverText: (a)=>this.setState({centerText:a})},
+      viroAppProps : {changeHoverText: (a)=>{
+        this.setState({centerText:a})
+      }},
       centerText : ""
     }
     this._initialARView = this._initialARView.bind(this);

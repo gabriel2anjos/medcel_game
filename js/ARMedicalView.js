@@ -16,6 +16,7 @@ import {
   ViroAmbientLight,
   ViroText,
   ViroNode,
+  ViroARPlaneSelector
 } from 'react-viro';
 
 
@@ -40,7 +41,7 @@ export default class ARMedicalView extends Component {
         return (
           <ViroARScene ref={(component)=>{this.cameraRef = component}} displayPointCloud={true} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} onClick={this._onCollision}>
           <ViroAmbientLight color="#ffffff" intensity={200}/>
-            {/* <ViroARPlaneSelector> */}
+            {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound}> */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
             <ViroNode>
             <ViroImage
@@ -129,13 +130,25 @@ export default class ARMedicalView extends Component {
             name={"Costas inferior"}
             onCollision={(a, name)=> this._onHover(a, name)}
           />
-
+          <HitboxObject
+            scale={[0.023,0.1,0.023]}
+            position={[-0.005,0.10,0.0]}
+            name={"Perna esquerda"}
+            onCollision={(a, name)=> this._onHover(a, name)}
+          />
+          <HitboxObject
+            scale={[0.023,0.1,0.023]}
+            position={[0.045,0.10,0.0]}
+            name={"Perna direita"}
+            onCollision={(a, name)=> this._onHover(a, name)}
+          />
         </ViroNode>
         )
     }
 
     _startRay(){
       setInterval(() => {
+        console.log("rodou")
       if (this.cameraRef) {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
             const from = orientation.position;
@@ -144,7 +157,7 @@ export default class ARMedicalView extends Component {
         }
 
         )
-      }}, 250)
+      }}, 350)
     }
 
     _onHover(isHovering, elemento){
