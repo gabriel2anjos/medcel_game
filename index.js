@@ -1,11 +1,10 @@
 
 
 import React, { Component } from 'react';
-import { Provider } from 'react-redux';
-import { createStore } from 'redux';
+
 import {name as appName} from './app.json';
 import App from './App';
-var reducers = require('./js/redux/reducers');
+
 
 import {
   AppRegistry
@@ -22,5 +21,6 @@ import {
 //     )
 //   }
 // }
+
 AppRegistry.registerComponent(appName, () => App);
 AppRegistry.registerComponent('ViroSample', () => App);

@@ -5,6 +5,8 @@ import {StyleSheet} from 'react-native';
 
 import HitboxObject from './Component/HitboxObject';
 
+import {hitboxIds} from './HitIds'
+
 import {
   ViroARScene,
   ViroConstants,
@@ -28,12 +30,11 @@ export default class ARMedicalView extends Component {
         super(props);
         // Set initial state here
         this.state = {
+          examinedId:-1,
           text : "Initializing AR...",
           animationName:"mixamo.com",
           modelAnim: false,
           loopState:false,
-          dialog: "Estou com dor de cabeça",
-          dialogVisible : true,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -49,18 +50,16 @@ export default class ARMedicalView extends Component {
               color="#ffffff"
           />
             
-            {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound}> */}
-            <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
+            <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.5} minWidth={.5}> 
+            {/* <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}> */}
             <ViroNode>
             <ViroImage
-                height={.80}
-                width={.80}
+                height={.60}
+                width={.60}
                 source={require("./res/floor.jpg")}
                 position={[0,0.0,0]}
                 rotation={[270,0,0]}
               />
-              {/* <ViroFlexView style={styles.titleContainer} position={[0.2, 0.4, -0.1]} rotation={[0, 0, 0]} height={.13} width={.32}> */}
-                {/* <ViroText style={styles.prodTitleText} position={[0.2, 0.7, -0.1]} rotation={[0, 0, 0]} text="AAAAA" width={.32} height={.0325} /> */}
                 <ViroFlexView style={styles.cardWrapper} 
                               width={5} height={1.5} 
                               position={[0.1, 0.39, -0.0]}
@@ -70,12 +69,11 @@ export default class ARMedicalView extends Component {
                               <ViroText style={styles.prodDescriptionText} textAlign="left"  fontWeight='100' text={this.state.dialog} />
                 </ViroFlexView>
               {this._renderIdle()}
-              {this._renderResting()}
-              {this._renderSitting()}
-              {this._renderHitBoxesIdle()}
-            {/* </ViroARPlaneSelector> */}
+              {/* {this._renderResting()}
+              {this._renderSitting()} */}
             </ViroNode>
-              </ViroARImageMarker>
+              {/* </ViroARImageMarker> */}
+              </ViroARPlaneSelector>
               <ViroARImageMarker target={"logo_v"}>
             <ViroNode>
             <Viro3DObject source={require('./res/heart/heart.obj')}
@@ -167,6 +165,7 @@ export default class ARMedicalView extends Component {
           animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
           materials={"pbr"}
           />
+          {this._renderHitBoxesIdle()}
         </ViroNode>
 
       )
@@ -178,7 +177,7 @@ export default class ARMedicalView extends Component {
           <HitboxObject
             scale={[0.05,0.05,0.05]}
             position={[-0.01,0.36,0]}
-            name={"Cabeça"}
+            name={hitboxIds[0]['name']}
             onCollision={(a, name)=> this._onHover(a, name)}
           />
           <HitboxObject
@@ -227,11 +226,18 @@ export default class ARMedicalView extends Component {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
             const from = orientation.position;
             const to = [orientation.forward[0]*100,orientation.forward[1]*100,orientation.forward[2]*100];
-            this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>collision?null:this._onHover(false))
+            this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>{
+             if (!collision){
+                this._onHover(false)
+                this.setState({
+                  examinedId:-1
+                });
+              }
+            });
         }
 
         )
-      }}, 350)
+      }}, 150)
     }
 
     _onHover(isHovering, elemento){

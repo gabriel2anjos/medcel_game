@@ -29,16 +29,17 @@ export default class App extends Component{
   constructor(props) {
     super(props);
     this.state = {
+      dialog:"",
       sharedProps : sharedProps,
       viroAppProps : {changeHoverText: (a)=>{
         this.setState({centerText:a})
-      }},
-      centerText : ""
+        },
+      }
     }
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
     this._changeHoverText = this._changeHoverText.bind(this);
-    this._ARView = React.createRef()
+    this._ARView = React.createRef();
   }
 
   render() {
@@ -48,6 +49,11 @@ export default class App extends Component{
         {this._overlayView()}
         <View style={styles.centerTextView}>
           <Text style={styles.centerText}> {this.state.centerText}</Text>
+        </View>
+        <View style={styles.textBoxContainer}>
+          <View style={styles.textBox}>
+            <Text style={styles.centerText}>{this.state.dialog}</Text>
+          </View>
         </View>
         {this._buttonComponents()}
       </View>
@@ -86,17 +92,15 @@ export default class App extends Component{
             style={styles.screenIcon} selected={true}
             onPress={()=>{
               console.log(this._ARView.current)
-              this._ARView.setState({
-              dialog: "Apertou",
-              dialogVisible : true,
-            })
-          }}
+            }}
         />
         <ButtonComponent key="button2"
             buttonState={'off'}
             stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
-            onPress={()=>{console.log("abc")}}
+            onPress={()=>{
+              console.log(this._ARView.current)
+            }}
         />
       </View>
     )
@@ -138,6 +142,34 @@ const styles = StyleSheet.create({
     position : 'absolute',
     height: 58,
     width: 58,
+  },
+  textBoxContainer:{
+    position : 'absolute',
+    top:13,
+    width:Dimensions.get('window').width,
+    height:90,
+    justifyContent: 'center',
+    alignItems: 'center',
+    flexDirection:'row',
+  },
+  textBox: {
+    position : 'absolute',
+    width:320,
+    flex:1,
+    top:0,
+    bottom:0,
+    flexDirection:'row',
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: '#fff',
+    backgroundColor: 'rgba(68,160,207,0.5)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
 
