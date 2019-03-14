@@ -10,7 +10,6 @@ export const hitboxIds = {
         name:'Torax',
         dialogos:{
             0:"Sinto um pouco de dor no peito.",
-            1:"Sinto umas pontadas",
             
         }
     },
