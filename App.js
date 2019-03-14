@@ -13,8 +13,9 @@ import {
 import {
   ViroARSceneNavigator
 } from 'react-viro';
-
+import {hitboxIds} from './js/HitIds'
 import ButtonComponent from './js/Component/ButtonComponent';
+
 
 
 
@@ -31,15 +32,18 @@ export default class App extends Component{
     this.state = {
       dialog:"",
       sharedProps : sharedProps,
-      viroAppProps : {changeHoverText: (a)=>{
-        this.setState({centerText:a})
-        },
-      }
-    }
+      viroAppProps : {changeHoverText: (a)=>{this.setState({centerText:a})},
+        changeParentID : this._changeSelectedID,
+      },
+      selectedId:-1,
+      indexDialog:0,
+      lastDialogId:0,
+    };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
     this._changeHoverText = this._changeHoverText.bind(this);
-    this._ARView = React.createRef();
+    this._changeSelectedID = this._changeSelectedID.bind(this)
+    this._changeDialogText = this._changeDialogText.bind(this);
   }
 
   render() {
@@ -52,7 +56,7 @@ export default class App extends Component{
         </View>
         <View style={styles.textBoxContainer}>
           <View style={styles.textBox}>
-            <Text style={styles.centerText}>{this.state.dialog}</Text>
+            <Text style={styles.dialogText}>{this.state.dialog}</Text>
           </View>
         </View>
         {this._buttonComponents()}
@@ -66,7 +70,6 @@ export default class App extends Component{
             style ={{flex:1}}
             initialScene={{scene: InitialARScene}}
             viroAppProps={this.state.viroAppProps}
-            ref={this._ARView}
       />
     )
   }
@@ -77,12 +80,44 @@ export default class App extends Component{
           )
   }
 
-  _changeHoverText(text){
+  _changeHoverText(){
+    let text = ""
+    id = this.state.selectedId;
+
+      if (id != -1){
+        text = hitboxIds[id]['name']
+      }
+      this.setState({
+        centerText : text,
+      })
+    
+  }
+  _changeDialogText(){
+    // lastId = this.state.lastDialogId;
+    // selectedId = this.state.selectedId;
+    // if (lastId != selectedId){
+    //   this.setState({
+    //     lastDialogId : selectedId,
+    //     indexDialog : 0,
+    //   })
+    // }
+    // if (this.state.indexDialog>=(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)){
+    //   this.setState({
+    //     indexDialog: 0
+    //   });
+    // }
+    let text = "";
+    if (this.state.selectedId != -1){
+      text = hitboxIds[this.state.selectedId]['dialogos'][0]
+    }
+    let newIndex = this.state.indexDialog + 1;
     this.setState({
-      centerText : text,
+      dialog : text,
+      indexDialog: newIndex
     })
   }
 
+  
   _buttonComponents(){
     return(
       <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:70, width:70, height:160, flex:1}}>
@@ -91,7 +126,6 @@ export default class App extends Component{
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              console.log(this._ARView.current)
             }}
         />
         <ButtonComponent key="button2"
@@ -99,11 +133,18 @@ export default class App extends Component{
             stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              console.log(this._ARView.current)
+              this._changeDialogText();
             }}
         />
       </View>
     )
+  }
+
+  _changeSelectedID = (id)=>{
+    this.setState({
+      selectedId:id
+    })
+    this._changeHoverText();
   }
 }
 
@@ -122,11 +163,6 @@ const styles = StyleSheet.create({
     height: 5,
     borderRadius: 5,
     borderWidth: 1,
-  },
-  centerText: {
-    color: 'grey',
-    fontWeight: 'bold',
-    fontSize: 15,
   },
   centerTextView: {
     position: 'absolute',
@@ -166,10 +202,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  centerText: {
+  dialogText: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: 15,
+    marginRight: 2,
+    marginLeft: 2,
   },
 });
 

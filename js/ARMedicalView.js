@@ -23,7 +23,6 @@ import {
   ViroOmniLight
 } from 'react-viro';
 
-
 export default class ARMedicalView extends Component {
 
     constructor(props) {
@@ -50,7 +49,7 @@ export default class ARMedicalView extends Component {
               color="#ffffff"
           />
             
-            <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.5} minWidth={.5}> 
+            <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}> 
             {/* <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}> */}
             <ViroNode>
             <ViroImage
@@ -60,17 +59,17 @@ export default class ARMedicalView extends Component {
                 position={[0,0.0,0]}
                 rotation={[270,0,0]}
               />
-                <ViroFlexView style={styles.cardWrapper} 
+                {/* <ViroFlexView style={styles.cardWrapper} 
                               width={5} height={1.5} 
                               position={[0.1, 0.39, -0.0]}
                               rotation={[0, 0, 0]}
                               scale={[0.03,0.03,0.03]}
                               visible={this.state.dialogVisible}>
                               <ViroText style={styles.prodDescriptionText} textAlign="left"  fontWeight='100' text={this.state.dialog} />
-                </ViroFlexView>
+                </ViroFlexView> */}
               {this._renderIdle()}
-              {/* {this._renderResting()}
-              {this._renderSitting()} */}
+              {this._renderResting()}
+              {this._renderSitting()}
             </ViroNode>
               {/* </ViroARImageMarker> */}
               </ViroARPlaneSelector>
@@ -104,7 +103,7 @@ export default class ARMedicalView extends Component {
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
-            <Viro3DObject
+            {/* <Viro3DObject
               source={require('./res/eric/idlelay.vrx')}
               resources={[
                 require('./res/eric/paciente_color.jpg'),
@@ -116,15 +115,15 @@ export default class ARMedicalView extends Component {
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
-              />
+              /> */}
         </ViroNode>
       )
     }
     _renderSitting(){
-      const pos = [-0.3,0,0];
+      const pos = [-0.2,0,0];
       return(
         <ViroNode>
-            <Viro3DObject
+            {/* <Viro3DObject
               source={require('./res/eric/idlesit.vrx')}
               resources={[
                 require('./res/eric/paciente_color.jpg'),
@@ -136,7 +135,7 @@ export default class ARMedicalView extends Component {
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
-            />
+            /> */}
             <Viro3DObject
               source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
               resources={[
@@ -178,43 +177,55 @@ export default class ARMedicalView extends Component {
             scale={[0.05,0.05,0.05]}
             position={[-0.01,0.36,0]}
             name={hitboxIds[0]['name']}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            onCollision={(a)=> this._onHover(a, 0)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,0.01]}
-            name={"Torax"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[1]['name']}
+            onCollision={(a)=> this._onHover(a, 1)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.3,0.00]}
+            name={""}
+            onCollision={()=>{}}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,-0.01]}
-            name={"Costas superior"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[3]['name']}
+            onCollision={(a)=> this._onHover(a, 3)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,0.01]}
-            name={"Abdome"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[2]['name']}
+            onCollision={(a)=> this._onHover(a, 2)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,-0.01]}
-            name={"Costas inferior"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[3]['name']}
+            onCollision={(a)=> this._onHover(a, 3)}
+          />
+          <HitboxObject
+            scale={[0.07,0.05,0.01]}
+            position={[0.0,0.23,0.00]}
+            name={""}
+            onCollision={()=>{}}
           />
           <HitboxObject
             scale={[0.023,0.1,0.023]}
             position={[-0.005,0.10,0.0]}
-            name={"Perna esquerda"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[4]['name']}
+            onCollision={(a)=> this._onHover(a, 4)}
           />
           <HitboxObject
             scale={[0.023,0.1,0.023]}
             position={[0.045,0.10,0.0]}
-            name={"Perna direita"}
-            onCollision={(a, name)=> this._onHover(a, name)}
+            name={hitboxIds[4]['name']}
+            onCollision={(a)=> this._onHover(a, 4)}
           />
         </ViroNode>
         )
@@ -242,10 +253,10 @@ export default class ARMedicalView extends Component {
 
     _onHover(isHovering, elemento){
         if (isHovering){
-            this.props.arSceneNavigator.viroAppProps.changeHoverText(elemento);
+          this.props.arSceneNavigator.viroAppProps.changeParentID(elemento);
         }
         else{
-            this.props.arSceneNavigator.viroAppProps.changeHoverText("");
+            this.props.arSceneNavigator.viroAppProps.changeParentID(-1);
         }
     }
 
