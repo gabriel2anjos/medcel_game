@@ -19,6 +19,7 @@ import ButtonComponent from './js/Component/ButtonComponent';
 
 
 
+
 var sharedProps = {
   apiKey:"A96217A2-0EA6-4173-803C-ACCF333CB9F6",
 }
@@ -38,6 +39,7 @@ export default class App extends Component{
       selectedId:-1,
       indexDialog:0,
       lastDialogId:0,
+      startedGame:1,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -47,9 +49,39 @@ export default class App extends Component{
   }
 
   render() {
-    return (
+    if(!this.state.startedGame)  return (
+      <View style={{ flex: 1 }}>
+        <View style={{flex: 1, width:(Dimensions.get('window').width), height: Dimensions.get('window').height, alignItems:'center'}}>
+         <Image style={styles.image} source={require('./js/res/relatorio.png')}></Image>
+        </View>
+        <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:30, width:70, height:160, flex:1}}>
+        <ButtonComponent key="button1"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/arrow.png"), require("./js/res/stethos.png")]}
+            style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              setTimeout(()=>{this.setState({startedGame:1})},1000);
+            }}
+            animationOnClick={true}
+        />
+        </View>
+      </View>
+    );
+    return(
       <View style={{ flex: 1 }}>
         {this._initialARView()}
+      </View>
+    )
+  }
+
+  _initialARView(){
+    return (
+      <View style={{ flex: 1 }}>
+        <ViroARSceneNavigator {...this.state.sharedProps}
+            style ={{flex:1}}
+            initialScene={{scene: InitialARScene}}
+            viroAppProps={this.state.viroAppProps}
+      />
         {this._overlayView()}
         <View style={styles.centerTextView}>
           <Text style={styles.centerText}> {this.state.centerText}</Text>
@@ -61,16 +93,7 @@ export default class App extends Component{
         </View>
         {this._buttonComponents()}
       </View>
-    );
-  }
-
-  _initialARView(){
-    return (
-      <ViroARSceneNavigator {...this.state.sharedProps}
-            style ={{flex:1}}
-            initialScene={{scene: InitialARScene}}
-            viroAppProps={this.state.viroAppProps}
-      />
+      
     )
   }
 
@@ -209,6 +232,24 @@ const styles = StyleSheet.create({
     marginRight: 2,
     marginLeft: 2,
   },
+  initialTitleText: {
+    color: 'black',
+    fontWeight: 'normal',
+    fontSize: 40,
+  },
+  image: {
+    flex: 1,
+
+    resizeMode: 'contain'
+  },
+  informationText:{
+    fontFamily: "Roboto",
+    color: 'grey',
+    fontWeight: '100',
+    fontSize: 25,
+    marginRight: 2,
+    marginLeft: 2,
+  }
 });
 
 module.exports = App

@@ -20,7 +20,8 @@ import {
   ViroNode,
   ViroARPlaneSelector,
   ViroFlexView,
-  ViroOmniLight
+  ViroOmniLight,
+  ViroBox
 } from 'react-viro';
 
 export default class ARMedicalView extends Component {
@@ -34,6 +35,7 @@ export default class ARMedicalView extends Component {
           animationName:"mixamo.com",
           modelAnim: false,
           loopState:false,
+          patientPosition:0 //0= sentado, 1= em pe, 2= deitado
         };
 
         this._onHover = this._onHover.bind(this);
@@ -49,8 +51,8 @@ export default class ARMedicalView extends Component {
               color="#ffffff"
           />
             
-            <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}> 
-            {/* <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}> */}
+            {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}>  */}
+            <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
             <ViroNode>
             <ViroImage
                 height={.60}
@@ -71,8 +73,8 @@ export default class ARMedicalView extends Component {
               {this._renderResting()}
               {this._renderSitting()}
             </ViroNode>
-              {/* </ViroARImageMarker> */}
-              </ViroARPlaneSelector>
+              </ViroARImageMarker>
+              {/* </ViroARPlaneSelector> */}
               <ViroARImageMarker target={"logo_v"}>
             <ViroNode>
             <Viro3DObject source={require('./res/heart/heart.obj')}
@@ -103,19 +105,6 @@ export default class ARMedicalView extends Component {
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
-            {/* <Viro3DObject
-              source={require('./res/eric/idlelay.vrx')}
-              resources={[
-                require('./res/eric/paciente_color.jpg'),
-              ]}
-              scale={[0.0022,0.0022,0.0022]}
-              position={[0.4,0,0]}
-              type='VRX'
-              ref={ "person"}
-              ignoreEventHandling={true}
-              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-              materials={"pbr"}
-              /> */}
         </ViroNode>
       )
     }
@@ -123,19 +112,6 @@ export default class ARMedicalView extends Component {
       const pos = [-0.2,0,0];
       return(
         <ViroNode>
-            {/* <Viro3DObject
-              source={require('./res/eric/idlesit.vrx')}
-              resources={[
-                require('./res/eric/paciente_color.jpg'),
-              ]}
-              scale={[0.0022,0.0022,0.0022]}
-              position={[pos[0] + -0.0,pos[1] + 0,pos[2] + 0]}
-              type='VRX'
-              ref={ "person"}
-              ignoreEventHandling={true}
-              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-              materials={"pbr"}
-            /> */}
             <Viro3DObject
               source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
               resources={[
@@ -146,6 +122,26 @@ export default class ARMedicalView extends Component {
               position={[pos[0]+ -0.0,pos[1]+ -.02,pos[2]+ -0.0]}
               type='OBJ'
             />
+            <ViroBox
+            physicsBody={{
+              type:'Kinematic',
+              shape: { type: "Box", params:[0.1,0.1,0.1]},
+            }} 
+            scale={[0.1,0.1,0.1]}
+            position={[0,0,0]}
+            onCollision={(a)=> this.props.alterPosition(a, 1)}
+            opacity={1.0}
+            />
+                        {/* <ViroBox
+            physicsBody={{
+              type:'Kinematic',
+              shape: { type: "Box"},
+            }} 
+            scale={[1,1,1]}
+            position={[0,0,0]}
+            onCollision={(a)=> this.props.alterPosition(a, 2)}
+            opacity={0.0}
+            /> */}
         </ViroNode>
       )
     }
@@ -258,6 +254,18 @@ export default class ARMedicalView extends Component {
         else{
             this.props.arSceneNavigator.viroAppProps.changeParentID(-1);
         }
+    }
+
+    _alterPosition(isHovering, position){
+      if (isHovering && position==0){
+        this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para sentar");
+      }
+      if (isHovering && position==1){
+        this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para ficar em pé");
+      }
+      if (isHovering && position==2){
+        this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para deitar");
+      }
     }
 
     _onAnchorFound(){

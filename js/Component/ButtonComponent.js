@@ -81,13 +81,13 @@ class ButtonComponent extends Component {
     }    
   }
   _onPress() {
-    if (this.props.buttonState === 'off') {
+    if (this.props.buttonState === 'off' && !this.props.animationOnClick) {
+      this.props.onPress();
+    }
+    requestAnimationFrame(() => {
       this.scale();
       this.props.onPress();
-      // from https://facebook.github.io/react-native/docs/performance.html#my-touchablex-view-isn-t-very-responsive
-      requestAnimationFrame(() => {
-      });
-    }
+    });
   }
 
   // Scale animation
@@ -129,6 +129,7 @@ ButtonComponent.propTypes = {
         style: PropTypes.any,
         selected: PropTypes.bool,
         onPress: PropTypes.func,
+        animationOnClick:  PropTypes.bool,
 };
 
 export default ButtonComponent;
