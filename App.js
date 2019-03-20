@@ -46,6 +46,8 @@ export default class App extends Component{
     this._changeHoverText = this._changeHoverText.bind(this);
     this._changeSelectedID = this._changeSelectedID.bind(this)
     this._changeDialogText = this._changeDialogText.bind(this);
+    this._ARScene = React.createRef();
+    console.log("aaa")
   }
 
   render() {
@@ -61,6 +63,7 @@ export default class App extends Component{
             style={styles.screenIcon} selected={true}
             onPress={()=>{
               setTimeout(()=>{this.setState({startedGame:1})},1000);
+              
             }}
             animationOnClick={true}
         />
@@ -78,6 +81,7 @@ export default class App extends Component{
     return (
       <View style={{ flex: 1 }}>
         <ViroARSceneNavigator {...this.state.sharedProps}
+          ref={this._ARScene}
             style ={{flex:1}}
             initialScene={{scene: InitialARScene}}
             viroAppProps={this.state.viroAppProps}
@@ -149,6 +153,8 @@ export default class App extends Component{
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
+              console.log("this._ARScene")
+              console.log(InitialARScene)
             }}
         />
         <ButtonComponent key="button2"

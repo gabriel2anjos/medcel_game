@@ -41,46 +41,31 @@ export default class ARMedicalView extends Component {
         this._onHover = this._onHover.bind(this);
         this._startRay = this._startRay.bind(this);
         this._onAnchorFound = this._onAnchorFound.bind(this);
+        this._alterPosition = this._alterPosition.bind(this);
     }
 
     render() {
         return (
-          <ViroARScene ref={(component)=>{this.cameraRef = component}} displayPointCloud={true} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} onClick={this._onCollision}>
+          <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: true}} onClick={this._onCollision}>
           <ViroNode scale={[1,1,1]} >
           <ViroAmbientLight
               color="#ffffff"
+              intensity={250}
           />
             
             {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}>  */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
             <ViroNode>
-            <ViroImage
-                height={.60}
-                width={.60}
-                source={require("./res/floor.jpg")}
-                position={[0,0.0,0]}
-                rotation={[270,0,0]}
-              />
-                {/* <ViroFlexView style={styles.cardWrapper} 
-                              width={5} height={1.5} 
-                              position={[0.1, 0.39, -0.0]}
-                              rotation={[0, 0, 0]}
-                              scale={[0.03,0.03,0.03]}
-                              visible={this.state.dialogVisible}>
-                              <ViroText style={styles.prodDescriptionText} textAlign="left"  fontWeight='100' text={this.state.dialog} />
-                </ViroFlexView> */}
-              {this._renderIdle()}
-              {this._renderResting()}
+              {this._renderWalls()}
+              {this._renderObjects()}
+              {/* {this._renderIdle()} */}
+              {/* {this._renderResting()} */}
               {this._renderSitting()}
             </ViroNode>
               </ViroARImageMarker>
               {/* </ViroARPlaneSelector> */}
               <ViroARImageMarker target={"logo_v"}>
             <ViroNode>
-            <Viro3DObject source={require('./res/heart/heart.obj')}
-                        position={[0,0.2,0]}
-                        scale={[0.3,0.3,0.3]}
-                       materials={["heart"]} type="OBJ" />
             </ViroNode>
               </ViroARImageMarker>
               </ViroNode>
@@ -91,47 +76,33 @@ export default class ARMedicalView extends Component {
       const pos = [0,0,0];
       return(
         <ViroNode>
+            
+        </ViroNode>
+      )
+    }
+    testes =()=>{
+      
+    }
+    _renderSitting(){
+      const pos = [-0.18,0,-0.18];
+      return(
+        <ViroNode>
             <Viro3DObject
-              source={require('./res/folding_bed/Folding_Bed.obj')}
+              source={require('./res/man/Sitting.vrx')}
               resources={[
-                require('./res/folding_bed/Folding_Bed.mtl'),
-                require('./res/folding_bed/Chrmwarp.jpg')
+                require('./res/man/paciente2_color.jpg'),
+                require('./res/man/paciente2_high_nm.jpg'),
+                require('./res/man/paciente2_spec.jpg'),
               ]}
-              scale={[0.0037,0.0037,0.0037]}
-              position={[0.4,0,0.14]}
-              type='OBJ'
+              scale={[0.0022,0.0022,0.0022]}
+              position={[pos[0] + -0.0,pos[1] + 0,pos[2] + 0]}
+              type='VRX'
               ref={ "person"}
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
-              />
-        </ViroNode>
-      )
-    }
-    _renderSitting(){
-      const pos = [-0.2,0,0];
-      return(
-        <ViroNode>
-            <Viro3DObject
-              source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
-              resources={[
-                require('./res/chair/cattelan_italia_cindy_obj.mtl'),
-              ]}
-              scale={[0.0022,0.0022,0.0022]}
-              rotation={[0,0,0]}
-              position={[pos[0]+ -0.0,pos[1]+ -.02,pos[2]+ -0.0]}
-              type='OBJ'
             />
-            <ViroBox
-            physicsBody={{
-              type:'Kinematic',
-              shape: { type: "Box", params:[0.1,0.1,0.1]},
-            }} 
-            scale={[0.1,0.1,0.1]}
-            position={[0,0,0]}
-            onCollision={(a)=> this.props.alterPosition(a, 1)}
-            opacity={1.0}
-            />
+            
                         {/* <ViroBox
             physicsBody={{
               type:'Kinematic',
@@ -149,9 +120,11 @@ export default class ARMedicalView extends Component {
       return(
         <ViroNode>
             <Viro3DObject
-          source={require('./res/eric/Idle.vrx')}
+          source={require('./res/man/BreathingIdle.vrx')}
           resources={[
-            require('./res/eric/paciente_color.jpg'),
+            require('./res/man/paciente2_color.jpg'),
+            require('./res/man/paciente2_high_nm.jpg'),
+            require('./res/man/paciente2_spec.jpg'),
           ]}
           scale={[0.0022,0.0022,0.0022]}
           type='VRX'
@@ -257,6 +230,7 @@ export default class ARMedicalView extends Component {
     }
 
     _alterPosition(isHovering, position){
+      console.log(isHovering, position)
       if (isHovering && position==0){
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para sentar");
       }
@@ -271,7 +245,113 @@ export default class ARMedicalView extends Component {
     _onAnchorFound(){
       this._startRay()
     }
+    _renderWalls(){
+      return(
+        <ViroNode>
+        <ViroImage
+                height={.60}
+                width={.60}
+                source={require("./res/floor.jpg")}
+                position={[0,0.0,0]}
+                rotation={[270,0,0]}
+              />
+              <ViroImage
+                height={.40}
+                width={.60}
+                source={require("./res/wall.png")}
+                position={[0,0.2,-0.3]}
+                rotation={[0,0,0]}
+              />
+              <ViroImage
+                height={.40}
+                width={.60}
+                source={require("./res/wall.png")}
+                position={[0.3,0.2,0]}
+                rotation={[0,270,0]}
+              />
+              <ViroImage
+                height={.40}
+                width={.60}
+                source={require("./res/wall.png")}
+                position={[-0.3,0.2,0]}
+                rotation={[0,90,0]}
+              />
+              <ViroImage
+                height={.40}
+                width={.60}
+                source={require("./res/wall.png")}
+                position={[0,0.2,0.3]}
+                rotation={[0,180,0]}
+              />
+              </ViroNode>
+      )
+    }
+  _renderObjects(){
+    const posCadeira = [-0.18,0,-0.18];
+    const posCama = [0.2,0,0.04];
+    const posPaciente = [0,0,0.18];
+    return(
+      <ViroNode>
+        <Viro3DObject
+              source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
+              resources={[
+                require('./res/chair/cattelan_italia_cindy_obj.mtl'),
+              ]}
+              scale={[0.0022,0.0022,0.0022]}
+              rotation={[0,0,0]}
+              position={[posCadeira[0],posCadeira[1],posCadeira[2]]}
+              type='OBJ'
+            />
+            <Viro3DObject
+              source={require('./res/folding_bed/Folding_Bed.obj')}
+              resources={[
+                require('./res/folding_bed/Folding_Bed.mtl'),
+                require('./res/folding_bed/Chrmwarp.jpg')
+              ]}
+              scale={[0.003,0.003,0.003]}
+              position={[posCama[0],posCama[1],posCama[2]]}
+              type='OBJ'
+              ref={ "person"}
+              ignoreEventHandling={true}
+              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
+              materials={"pbr"}
+              />
 
+            
+            <ViroBox
+            physicsBody={{
+              type:'Kinematic',
+              shape: { type: "Box", params:[0.1,0.1,0.1]},
+            }} 
+            scale={[0.1,0.05,0.1]}
+            position={[posCama[0],posCama[1],posCama[2]-0.1]}
+            onCollision={(a)=> this._alterPosition(a, 2)}
+            opacity={0.0}
+            />
+
+            <ViroBox
+            physicsBody={{
+              type:'Kinematic',
+              shape: { type: "Box", params:[0.1,0.1,0.1]},
+            }} 
+            scale={[0.1,0.05,0.1]}
+            position={[posCadeira[0],posCadeira[1],posCadeira[2]]}
+            onCollision={(a)=> this._alterPosition(a, 0)}
+            opacity={0.0}
+            />
+            <ViroBox
+            physicsBody={{
+              type:'Kinematic',
+              shape: { type: "Box", params:[0.1,0.1,0.1]},
+            }} 
+            scale={[0.1,0.05,0.1]}
+            position={[posPaciente[0],posPaciente[1],posPaciente[2]]}
+            onCollision={(a)=> this._alterPosition(a, 1)}
+            opacity={0.0}
+            />
+      </ViroNode>
+    )
+  }
 }
 
 ViroMaterials.createMaterials({
@@ -291,7 +371,7 @@ ViroARTrackingTargets.createTargets({
     logo : {
       source : require('./res/qrcode.png'),
       orientation : "Up",
-      physicalWidth : 0.165 // real world width in meters
+      physicalWidth : 0.200 // real world width in meters
     },
     logo_v : {
       source : require('./res/logo_v.png'),
