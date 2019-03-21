@@ -84,10 +84,11 @@ class ButtonComponent extends Component {
     if (this.props.buttonState === 'off' && !this.props.animationOnClick) {
       this.props.onPress();
     }
+    if (this.props.buttonState === 'off' && this.props.animationOnClick) {
     requestAnimationFrame(() => {
       this.scale();
       this.props.onPress();
-    });
+    });}
   }
 
   // Scale animation
