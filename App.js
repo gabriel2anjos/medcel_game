@@ -32,11 +32,15 @@ export default class App extends Component{
     super(props);
     this.state = {
       dialog:"",
+      exam:"",
       sharedProps : sharedProps,
-      viroAppProps : {changeHoverText: (a)=>{this.setState({centerText:a})},
+      viroAppProps : {
+        changeHoverText: (a)=>this.setState({centerText:a}),
         changeParentID : this._changeSelectedID,
         clickClear: this._clickClearVar,
         getButtonState: this._getButtonState,
+        hoverObject: (a)=>this.setState({hoveringObject:a,}),
+        setPos: (a)=>this.setState({patientPosition:a,}),
       },
       selectedId:-1,
       indexDialog:0,
@@ -44,6 +48,11 @@ export default class App extends Component{
       startedGame:1,
       buttonWasClicked:0,
       idButtonClicked:-1,
+      patientPosition:0,
+      arrowsVisible:false,
+      hoveringObject:0,
+      indexExam:0,
+      lastExam:0,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -94,6 +103,7 @@ export default class App extends Component{
         {this._overlayView()}
         <View style={styles.centerTextView}>
           <Text style={styles.centerText}> {this.state.centerText}</Text>
+          {this.patientPosition==2?<Text style={styles.centerExamText}> teste</Text>:null}
         </View>
         <View style={styles.textBoxContainer}>
           <View style={styles.textBox}>
@@ -124,6 +134,9 @@ export default class App extends Component{
       })
     
   }
+
+
+
   async _changeDialogText(){
     lastId = this.state.lastDialogId;
     selectedId = this.state.selectedId;
@@ -133,14 +146,11 @@ export default class App extends Component{
         indexDialog : 0,
       })
     }
-    console.log(lastId,selectedId,this.state.indexDialog)
-    console.log(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)
+
     if (this.state.indexDialog>=(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)){
-      console.log("rodou")
       await this.setState({
         indexDialog: 0
       });
-      console.log(this.state.indexDialog)
     }
     let text = "";
     if (this.state.selectedId != -1){
@@ -155,47 +165,55 @@ export default class App extends Component{
   }
 
 
-  
   _buttonComponents(){
     return(
       <View>
       <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:40, width:70, height:160, flex:1}}>
-        <ButtonComponent key="button1"
+        <ButtonComponent key="examinar"
             buttonState={'off'}
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              this._passClick(0);
             }}
         />
-        <ButtonComponent key="button2"
+        <ButtonComponent key="conversar"
             buttonState={'off'}
             stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/dialogue.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
               this._changeDialogText();
-              this._passClick(1);
             }}
         />
       </View>
+      
       <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:30, width:70, height:160, flex:1}}>
-      <ButtonComponent key="button1"
+      {this.state.hoveringObject!=0?<ButtonComponent key="clicar"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/click.png"), require("./js/res/click.png")]}
+            style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              if (this.state.hoveringObject!=0){
+                this.setState({
+                  patientPosition:this.state.hoveringObject,
+                });
+                this._passClick(1);
+              }
+            }}
+        />:null}
+      {this.state.arrowsVisible?<ButtonComponent key="setacima"
             buttonState={'off'}
             stateImageArray={[require("./js/res/arrowmenuup.png"), require("./js/res/arrowmenuup.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              console.log("this._ARScene")
-              console.log(InitialARScene)
             }}
-        />
-        <ButtonComponent key="button2"
+        />:null}
+        {this.state.arrowsVisible?<ButtonComponent key="setabaixo"
             buttonState={'off'}
             stateImageArray={[require("./js/res/arrowmenudown.png"), require("./js/res/arrowmenudown.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              this._changeDialogText();
             }}
-        />
+        />:null}
       </View>
     </View>
     )
@@ -210,7 +228,7 @@ export default class App extends Component{
 
   _passClick(id){
     this.setState({
-      buttonWasClicked:id,
+      buttonWasClicked:1,
       idButtonClicked:id,
   });
   }
@@ -248,8 +266,13 @@ const styles = StyleSheet.create({
     left: (Dimensions.get('window').width / 2),
   },
   centerText: {
-    color: 'grey',
+    color: '#a9a9a9',
     fontWeight: 'bold',
+    fontSize: 18,
+  },
+  centerExamText: {
+    color: '#a9a9a9',
+    fontWeight: 'normal',
     fontSize: 15,
   },
   screenIcon: {

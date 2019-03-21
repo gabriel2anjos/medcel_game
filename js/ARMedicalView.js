@@ -36,6 +36,7 @@ export default class ARMedicalView extends Component {
           modelAnim: false,
           loopState:false,
           patientPosition:1, //0= sentado, 1= em pe, 2= deitado
+          alterPosition:0,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -79,7 +80,21 @@ export default class ARMedicalView extends Component {
       const pos = [0,0,0];
       return(
         <ViroNode>
-            
+            <Viro3DObject
+              source={require('./res/paciente/sleeping.vrx')}
+              resources={[
+                require('./res/paciente/pacienteIdosaSR_color.jpg'),
+                require('./res/paciente/pacienteIdosaSR_high_nm.jpg'),
+                require('./res/paciente/pacienteIdosaSR_spec.jpg'),
+              ]}
+              scale={[0.0022,0.0022,0.0022]}
+              position={[0.23,-0.03,-0.09]}
+              type='VRX'
+              ref={ "person"}
+              ignoreEventHandling={true}
+              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
+              materials={"pbr"}
+            />
         </ViroNode>
       )
     }
@@ -89,11 +104,11 @@ export default class ARMedicalView extends Component {
       return(
         <ViroNode>
             <Viro3DObject
-              source={require('./res/man/Sitting.vrx')}
+              source={require('./res/paciente/sitting.vrx')}
               resources={[
-                require('./res/man/paciente2_color.jpg'),
-                require('./res/man/paciente2_high_nm.jpg'),
-                require('./res/man/paciente2_spec.jpg'),
+                require('./res/paciente/pacienteIdosa_color.jpg'),
+                require('./res/paciente/pacienteIdosa_high_nm.jpg'),
+                require('./res/paciente/pacienteIdosa_spec.jpg'),
               ]}
               scale={[0.0022,0.0022,0.0022]}
               position={[pos[0] + -0.0,pos[1] + 0,pos[2] + 0]}
@@ -111,11 +126,11 @@ export default class ARMedicalView extends Component {
       return(
         <ViroNode>
             <Viro3DObject
-          source={require('./res/man/BreathingIdle.vrx')}
+          source={require('./res/paciente/idle.vrx')}
           resources={[
-            require('./res/man/paciente2_color.jpg'),
-            require('./res/man/paciente2_high_nm.jpg'),
-            require('./res/man/paciente2_spec.jpg'),
+            require('./res/paciente/pacienteIdosa_color.jpg'),
+            require('./res/paciente/pacienteIdosa_high_nm.jpg'),
+            require('./res/paciente/pacienteIdosa_spec.jpg'),
           ]}
           scale={[0.0022,0.0022,0.0022]}
           type='VRX'
@@ -200,9 +215,11 @@ export default class ARMedicalView extends Component {
             this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>{
              if (!collision){
                 this._onHover(false)
+                this._alterPosition(false)
                 this.setState({
                   examinedId:-1
                 });
+
               }
             });
         }
@@ -213,12 +230,20 @@ export default class ARMedicalView extends Component {
     _detectButton(){
       setInterval(() => {
       let state = this.props.arSceneNavigator.viroAppProps.getButtonState();
-      console.log(state)
-      if (state['clicked']){
-        let patientPosition = 0
-        if (this.state.patientPosition == 0) patientPosition=1;
+      if (state['clicked']==0) return;
+      if (this.state.alterPosition == 1){
         this.setState({
-          patientPosition:patientPosition
+          patientPosition:0,
+        })
+      }
+      else if (this.state.alterPosition == 2){
+        this.setState({
+          patientPosition:1,
+        })
+      }
+      else if (this.state.alterPosition == 3){
+        this.setState({
+          patientPosition:2,
         })
       }
     }, 500)
@@ -237,12 +262,32 @@ export default class ARMedicalView extends Component {
     _alterPosition(isHovering, position){
       if (isHovering && position==0){
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para sentar");
+        this.props.arSceneNavigator.viroAppProps.hoverObject(1);
+        this.setState({
+          alterPosition:1,
+        });
       }
-      if (isHovering && position==1){
+      else if (isHovering && position==1){
+        
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para ficar em pé");
+        this.props.arSceneNavigator.viroAppProps.hoverObject(2);
+        this.setState({
+          alterPosition:2,
+        });
       }
-      if (isHovering && position==2){
+      else if (isHovering && position==2){
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para deitar");
+        this.props.arSceneNavigator.viroAppProps.hoverObject(3);
+        this.setState({
+          alterPosition:3,
+        });
+      }
+      else{
+        if (this.state.alterPosition!=0) {this.setState({
+          alterPosition:0,
+        });
+        this.props.arSceneNavigator.viroAppProps.hoverObject(0);
+      }
       }
     }
 
@@ -287,12 +332,27 @@ export default class ARMedicalView extends Component {
                 position={[0,0.2,0.4]}
                 rotation={[0,180,0]}
               />
+              <ViroImage
+                height={0.2}
+                width={0.12}
+                source={require("./res/window.png")}
+                position={[-0.2,0.24,-0.3999]}
+                rotation={[0,0,0]}
+              />
+              
+              <ViroImage
+                height={0.17}
+                width={0.17}
+                source={require("./res/medcellogo.png")}
+                position={[0.3999,0.2,0]}
+                rotation={[0,-90,0]}
+              />
               </ViroNode>
       )
     }
   _renderObjects(){
     const posCadeira = [-0.18,0,-0.18];
-    const posCama = [0.2,0,0.04];
+    const posCama = [0.23,0,0.04];
     const posPaciente = [0,0,0.18];
     return(
       <ViroNode>
@@ -311,7 +371,7 @@ export default class ARMedicalView extends Component {
               resources={[
                 require('./res/folding_bed/Folding_Bed_mtl.mtl'),
               ]}
-              scale={[0.003,0.003,0.003]}
+              scale={[0.0033,0.0033,0.0033]}
               position={[posCama[0],posCama[1],posCama[2]]}
               type='OBJ'
               ref={ "person"}
