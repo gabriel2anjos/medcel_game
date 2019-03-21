@@ -147,7 +147,8 @@ export default class App extends Component{
   
   _buttonComponents(){
     return(
-      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:70, width:70, height:160, flex:1}}>
+      <View>
+      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:40, width:70, height:160, flex:1}}>
         <ButtonComponent key="button1"
             buttonState={'off'}
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
@@ -166,6 +167,26 @@ export default class App extends Component{
             }}
         />
       </View>
+      <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:30, width:70, height:160, flex:1}}>
+      <ButtonComponent key="button1"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/arrowmenuup.png"), require("./js/res/arrowmenuup.png")]}
+            style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              console.log("this._ARScene")
+              console.log(InitialARScene)
+            }}
+        />
+        <ButtonComponent key="button2"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/arrowmenudown.png"), require("./js/res/arrowmenudown.png")]}
+            style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              this._changeDialogText();
+            }}
+        />
+      </View>
+    </View>
     )
   }
 

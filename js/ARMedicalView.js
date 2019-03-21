@@ -369,7 +369,7 @@ ViroMaterials.createMaterials({
 
 ViroARTrackingTargets.createTargets({
     logo : {
-      source : require('./res/qrcode.png'),
+      source : require('./res/qrcodes/Medcel_AR_Base.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
