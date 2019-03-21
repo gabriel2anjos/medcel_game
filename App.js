@@ -35,19 +35,24 @@ export default class App extends Component{
       sharedProps : sharedProps,
       viroAppProps : {changeHoverText: (a)=>{this.setState({centerText:a})},
         changeParentID : this._changeSelectedID,
+        clickClear: this._clickClearVar,
+        getButtonState: this._getButtonState,
       },
       selectedId:-1,
       indexDialog:0,
       lastDialogId:0,
       startedGame:1,
+      buttonWasClicked:0,
+      idButtonClicked:-1,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
     this._changeHoverText = this._changeHoverText.bind(this);
     this._changeSelectedID = this._changeSelectedID.bind(this)
     this._changeDialogText = this._changeDialogText.bind(this);
+    this._passClick = this._passClick.bind(this);
+    this._getButtonState = this._getButtonState.bind(this);
     this._ARScene = React.createRef();
-    console.log("aaa")
   }
 
   render() {
@@ -119,30 +124,36 @@ export default class App extends Component{
       })
     
   }
-  _changeDialogText(){
-    // lastId = this.state.lastDialogId;
-    // selectedId = this.state.selectedId;
-    // if (lastId != selectedId){
-    //   this.setState({
-    //     lastDialogId : selectedId,
-    //     indexDialog : 0,
-    //   })
-    // }
-    // if (this.state.indexDialog>=(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)){
-    //   this.setState({
-    //     indexDialog: 0
-    //   });
-    // }
+  async _changeDialogText(){
+    lastId = this.state.lastDialogId;
+    selectedId = this.state.selectedId;
+    if (lastId != selectedId){
+      await this.setState({
+        lastDialogId : selectedId,
+        indexDialog : 0,
+      })
+    }
+    console.log(lastId,selectedId,this.state.indexDialog)
+    console.log(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)
+    if (this.state.indexDialog>=(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)){
+      console.log("rodou")
+      await this.setState({
+        indexDialog: 0
+      });
+      console.log(this.state.indexDialog)
+    }
     let text = "";
     if (this.state.selectedId != -1){
-      text = hitboxIds[this.state.selectedId]['dialogos'][0]
+      text = hitboxIds[this.state.selectedId]['dialogos'][this.state.indexDialog]['fala'];
     }
     let newIndex = this.state.indexDialog + 1;
+
     this.setState({
       dialog : text,
       indexDialog: newIndex
     })
   }
+
 
   
   _buttonComponents(){
@@ -153,16 +164,16 @@ export default class App extends Component{
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
-              console.log("this._ARScene")
-              console.log(InitialARScene)
+              this._passClick(0);
             }}
         />
         <ButtonComponent key="button2"
             buttonState={'off'}
-            stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/stethos.png")]}
+            stateImageArray={[require("./js/res/dialogue.png"), require("./js/res/dialogue.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
               this._changeDialogText();
+              this._passClick(1);
             }}
         />
       </View>
@@ -174,6 +185,23 @@ export default class App extends Component{
       selectedId:id
     })
     this._changeHoverText();
+  }
+
+  _passClick(id){
+    this.setState({
+      buttonWasClicked:id,
+      idButtonClicked:id,
+  });
+  }
+
+  _getButtonState = ()=>{
+    let button = this.state.buttonWasClicked;
+    let id = this.state.idButtonClicked;
+    this.setState({
+      buttonWasClicked:0,
+      idButtonClicked:-1,
+    });
+  return {clicked:button, id:id}
   }
 }
 

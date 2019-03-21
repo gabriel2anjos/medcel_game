@@ -35,18 +35,21 @@ export default class ARMedicalView extends Component {
           animationName:"mixamo.com",
           modelAnim: false,
           loopState:false,
-          patientPosition:0 //0= sentado, 1= em pe, 2= deitado
+          patientPosition:1, //0= sentado, 1= em pe, 2= deitado
         };
 
         this._onHover = this._onHover.bind(this);
         this._startRay = this._startRay.bind(this);
         this._onAnchorFound = this._onAnchorFound.bind(this);
         this._alterPosition = this._alterPosition.bind(this);
+        this._detectButton = this._detectButton.bind(this);
     }
-
+    componentDidMount(){
+      this._detectButton();
+    }
     render() {
         return (
-          <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: true}} onClick={this._onCollision}>
+          <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} >
           <ViroNode scale={[1,1,1]} >
           <ViroAmbientLight
               color="#ffffff"
@@ -58,9 +61,9 @@ export default class ARMedicalView extends Component {
             <ViroNode>
               {this._renderWalls()}
               {this._renderObjects()}
-              {/* {this._renderIdle()} */}
-              {/* {this._renderResting()} */}
-              {this._renderSitting()}
+              {this.state.patientPosition==1?this._renderIdle():null}
+              {this.state.patientPosition==2?this._renderResting():null}
+              {this.state.patientPosition==0?this._renderSitting():null}
             </ViroNode>
               </ViroARImageMarker>
               {/* </ViroARPlaneSelector> */}
@@ -80,9 +83,7 @@ export default class ARMedicalView extends Component {
         </ViroNode>
       )
     }
-    testes =()=>{
-      
-    }
+
     _renderSitting(){
       const pos = [-0.18,0,-0.18];
       return(
@@ -103,16 +104,6 @@ export default class ARMedicalView extends Component {
               materials={"pbr"}
             />
             
-                        {/* <ViroBox
-            physicsBody={{
-              type:'Kinematic',
-              shape: { type: "Box"},
-            }} 
-            scale={[1,1,1]}
-            position={[0,0,0]}
-            onCollision={(a)=> this.props.alterPosition(a, 2)}
-            opacity={0.0}
-            /> */}
         </ViroNode>
       )
     }
@@ -217,7 +208,20 @@ export default class ARMedicalView extends Component {
         }
 
         )
-      }}, 150)
+      }}, 300)
+    }
+    _detectButton(){
+      setInterval(() => {
+      let state = this.props.arSceneNavigator.viroAppProps.getButtonState();
+      console.log(state)
+      if (state['clicked']){
+        let patientPosition = 0
+        if (this.state.patientPosition == 0) patientPosition=1;
+        this.setState({
+          patientPosition:patientPosition
+        })
+      }
+    }, 500)
     }
 
     _onHover(isHovering, elemento){
@@ -228,9 +232,9 @@ export default class ARMedicalView extends Component {
             this.props.arSceneNavigator.viroAppProps.changeParentID(-1);
         }
     }
+    
 
     _alterPosition(isHovering, position){
-      console.log(isHovering, position)
       if (isHovering && position==0){
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para sentar");
       }
@@ -243,44 +247,44 @@ export default class ARMedicalView extends Component {
     }
 
     _onAnchorFound(){
-      this._startRay()
+      this._startRay();
     }
     _renderWalls(){
       return(
         <ViroNode>
         <ViroImage
-                height={.60}
-                width={.60}
+                height={.80}
+                width={.80}
                 source={require("./res/floor.jpg")}
                 position={[0,0.0,0]}
                 rotation={[270,0,0]}
               />
               <ViroImage
                 height={.40}
-                width={.60}
+                width={.80}
                 source={require("./res/wall.png")}
-                position={[0,0.2,-0.3]}
+                position={[0,0.2,-0.4]}
                 rotation={[0,0,0]}
               />
               <ViroImage
                 height={.40}
-                width={.60}
+                width={.80}
                 source={require("./res/wall.png")}
-                position={[0.3,0.2,0]}
+                position={[0.4,0.2,0]}
                 rotation={[0,270,0]}
               />
               <ViroImage
                 height={.40}
-                width={.60}
+                width={.80}
                 source={require("./res/wall.png")}
-                position={[-0.3,0.2,0]}
+                position={[-0.4,0.2,0]}
                 rotation={[0,90,0]}
               />
               <ViroImage
                 height={.40}
-                width={.60}
+                width={.80}
                 source={require("./res/wall.png")}
-                position={[0,0.2,0.3]}
+                position={[0,0.2,0.4]}
                 rotation={[0,180,0]}
               />
               </ViroNode>
@@ -295,7 +299,7 @@ export default class ARMedicalView extends Component {
         <Viro3DObject
               source={require('./res/chair/cattelan_italia_cindy_obj.obj')}
               resources={[
-                require('./res/chair/cattelan_italia_cindy_obj.mtl'),
+                require('./res/chair/cattelan_italia_cindy_mtl.mtl'),
               ]}
               scale={[0.0022,0.0022,0.0022]}
               rotation={[0,0,0]}
@@ -305,8 +309,7 @@ export default class ARMedicalView extends Component {
             <Viro3DObject
               source={require('./res/folding_bed/Folding_Bed.obj')}
               resources={[
-                require('./res/folding_bed/Folding_Bed.mtl'),
-                require('./res/folding_bed/Chrmwarp.jpg')
+                require('./res/folding_bed/Folding_Bed_mtl.mtl'),
               ]}
               scale={[0.003,0.003,0.003]}
               position={[posCama[0],posCama[1],posCama[2]]}
@@ -316,9 +319,8 @@ export default class ARMedicalView extends Component {
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={"pbr"}
               />
-
             
-            <ViroBox
+            {this.state.patientPosition != 2?<ViroBox
             physicsBody={{
               type:'Kinematic',
               shape: { type: "Box", params:[0.1,0.1,0.1]},
@@ -327,8 +329,8 @@ export default class ARMedicalView extends Component {
             position={[posCama[0],posCama[1],posCama[2]-0.1]}
             onCollision={(a)=> this._alterPosition(a, 2)}
             opacity={0.0}
-            />
-
+            />: null}
+            {this.state.patientPosition != 0?
             <ViroBox
             physicsBody={{
               type:'Kinematic',
@@ -338,7 +340,8 @@ export default class ARMedicalView extends Component {
             position={[posCadeira[0],posCadeira[1],posCadeira[2]]}
             onCollision={(a)=> this._alterPosition(a, 0)}
             opacity={0.0}
-            />
+            />: null}
+            {this.state.patientPosition != 1?
             <ViroBox
             physicsBody={{
               type:'Kinematic',
@@ -348,7 +351,7 @@ export default class ARMedicalView extends Component {
             position={[posPaciente[0],posPaciente[1],posPaciente[2]]}
             onCollision={(a)=> this._alterPosition(a, 1)}
             opacity={0.0}
-            />
+            />:null}
       </ViroNode>
     )
   }
