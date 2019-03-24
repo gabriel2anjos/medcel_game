@@ -86,18 +86,52 @@ export default class ARMedicalView extends Component {
               {this.state.patientPosition==0?this._renderSitting():null}
             </ViroNode>
             </ViroARImageMarker>
-              {/* </ViroARPlaneSelector> */}
-            <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4})}}>
+            <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3)});this.setState({cardActive:3});console.log("card imagem")}}>
             <ViroNode>
-              {this.state.exameImagemSource=="./res/heart/heart.obj"?
+              {this.state.exameImagemSource=="./res/heart/heart.obj"&&this.state.cardActive==3?
               <Viro3DObject
               source={require("./res/heart/heart.obj")}
               scale={[0.4,0.4,0.4]}
-              position={[0,1,0]}
+              position={[0,0.4,0]}
               type='OBJ'
               ignoreEventHandling={true}
               materials={"heart"}
             />
+            :null}
+            </ViroNode>
+            </ViroARImageMarker>
+            <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2)});this.setState({cardActive:2});console.log("card raiox")}}>
+            {/* <ViroNode>
+              {this.state.exameImagemSource=="./res/osso.png"?
+              
+            :null}
+            </ViroNode> */}
+            </ViroARImageMarker>
+            <ViroARImageMarker target={"logo_sangue"} onAnchorFound={()=>{this.setState({exameSangueSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4});console.log("card sangue")}}>
+            <ViroNode>
+              {this.state.cardActive==4?
+                <ViroImage
+                height={.20}
+                width={.20}
+                source={require("./res/wall.png")}
+                position={[0,0.6,0]}
+                rotation={[0,0,0]}
+                materials={["blinn"]}
+              />
+            :null}
+            </ViroNode>
+            </ViroARImageMarker>
+            <ViroARImageMarker target={"logo_urina"} onAnchorFound={()=>{this.setState({exameUrinaSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(5)});this.setState({cardActive:5});console.log("card urina")}}>
+            <ViroNode>
+              {this.state.cardActive==5?
+                <ViroImage
+                height={.20}
+                width={.20}
+                source={require("./res/wall.png")}
+                position={[0,0.6,0]}
+                rotation={[0,0,0]}
+                materials={["blinn"]}
+              />
             :null}
             </ViroNode>
             </ViroARImageMarker>
@@ -477,27 +511,27 @@ ViroMaterials.createMaterials({
 
 ViroARTrackingTargets.createTargets({
     logo : {
-      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      source : require('./res/qrcodes/cardbase.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
     logo_sangue : {
-      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      source : require('./res/qrcodes/cardsangue.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
     logo_imagem : {
-      source : require('./res/qrcodes/Medcel_AR_Imagem.png'),
+      source : require('./res/qrcodes/cardimagem.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
     logo_urina : {
-      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      source : require('./res/qrcodes/cardurina.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
     logo_raiox : {
-      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      source : require('./res/qrcodes/cardraiox.png'),
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },

@@ -8,13 +8,16 @@ import {
   TouchableHighlight,
   Dimensions,
   Image,
+  Picker,
   TouchableOpacity
 } from 'react-native';
+
 
 import {
   ViroARSceneNavigator
 } from 'react-viro';
 import {arvore} from './js/HitIds'
+import {doencas} from './js/Doencas'
 
 import {FinalScore} from './js/FinalScore'
 
@@ -36,7 +39,7 @@ import Dialog, {
 
 // const App = createAppContainer(MainNavigator);
 
-
+var PickerItem = Picker.Item;
 
 
 var sharedProps = {
@@ -46,7 +49,7 @@ var sharedProps = {
 var InitialARScene = require('./js/ARMedicalView');
 
 
-export default class HomeScreen extends Component{
+export default class App extends Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -60,7 +63,7 @@ export default class HomeScreen extends Component{
         getButtonState: this._getButtonState,
         hoverObject: (a)=>this.setState({hoveringObject:a,}),
         cardImagem: "",
-        cardPlayed : ()=>this._cardPlayed(),
+        cardPlayed : (a)=>this._cardPlayed(a),
       },
       selectedId:-1,
       indexDialog:0,
@@ -75,7 +78,21 @@ export default class HomeScreen extends Component{
       indexExam:0,
       lastExamId:0,
       storedIdImagemExame:-1,
+      storeIndexExameSangue:-1,
+      storedIdExameSangue:-1,
+      storeIndexExameUrina:-1,
+      storedIdExameUrina:-1,
+      storedIdRaioXExame:-1,
+      storedIndexRaioXExame:-1,
       storeIndexImagemExame:-1,
+      finishedGame:0,
+      pointsCalculated:0,
+      precisionAcquired:0,
+      precisionTotal:0,
+      points:0,
+      errorList:[],
+      doencas:doencas,
+      doencaSelecionada:0,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -89,9 +106,14 @@ export default class HomeScreen extends Component{
     this._ARScene = React.createRef();
     this._clickExam = this._clickExam.bind(this);
     this._cardPlayed = this._cardPlayed.bind(this);
+    this._renderLastScreen = this._renderLastScreen.bind(this);
+    this._calculatePoints = this._calculatePoints.bind(this);
   }
 
   render() {
+      let opcoesDoencas = this.state.doencas.map( (s, i) => {
+        return <Picker.Item key={i} value={s} label={s} />
+    });
     if(!this.state.startedGame)  return (
       <View style={{ flex: 1 }}>
         <View style={{flex: 1, width:(Dimensions.get('window').width), height: Dimensions.get('window').height, alignItems:'center'}}>
@@ -109,6 +131,11 @@ export default class HomeScreen extends Component{
             animationOnClick={true}
         />
         </View>
+      </View>
+    );
+    if(this.state.finishedGame)  return (
+      <View style={{ flex: 1 }}>
+        {this._renderLastScreen()}
       </View>
     );
     return(
@@ -148,7 +175,7 @@ export default class HomeScreen extends Component{
               <DialogButton
                 text="Finalizar"
                 bordered
-                onPress={() => navigate('FinalScore')}
+                onPress={() => {this.setState({isModalVisible: false}); this._calculatePoints(); setTimeout(()=>this.setState({finishedGame: true}),500)}}
                 key="button-2"
               />
             </DialogFooter>
@@ -160,6 +187,11 @@ export default class HomeScreen extends Component{
             }}
           >
             <Text style={{color:"black", fontFamily:"Roboto",textAlign:"center"}}>Já sabe o diagnóstico? Clique em concluir para terminar o exame!</Text>
+            <Picker
+              selectedValue = {this.state.doencaSelecionada}
+              onValueChange = {(doenca)=>{this.setState({doencaSelecionada:doenca})}}>
+              {opcoesDoencas}
+            </Picker>
           </DialogContent>
         </Dialog>
       </View>
@@ -234,7 +266,7 @@ export default class HomeScreen extends Component{
       text = arvore[this.state.selectedId]['dialogos'][this.state.indexDialog]['fala'];
     }
     let newIndex = this.state.indexDialog + 1;
-
+    arvore[this.state.selectedId]['dialogos'][this.state.indexDialog]['checado']=true;
     this.setState({
       dialog : text,
       indexDialog: newIndex
@@ -393,35 +425,161 @@ export default class HomeScreen extends Component{
   }
 
   _cardPlayed(type){
-    //type=> 1 = sangue, 2 = urina, 3 = raioX, 4 = imagem
-    if (type=4){
+    //Tipos: 0 - Consulatorio, 1 - Audio, 2 - RaioX, 3 - Imagem, 4 - Sangue, 5 - Urina
+    this.setState({
+      dialog:"Exame realizado."
+    })
+    console.log("AAAAAAAAAAAAAAAAA")
+    console.log(type)
+    if (type==2){
+      if(this.state.storedIdRaioXExame==-1) return "";
+      arvore[this.state.storedIdRaioXExame]['exames'][this.state.storedIndexRaioXExame]["checado"]=true;
+      return arvore[this.state.storedIdRaioXExame]['exames'][this.state.storedIndexRaioXExame]["resultado"];
+    }
+    else if (type==3){
       if(this.state.storedIdImagemExame==-1) return "";
       arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["checado"]=true;
+      console.log(arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["resultado"])
       return arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["resultado"];
+    }
+    else if (type==4){
+      if(this.state.storedIdExameSangue==-1) return "";
+      arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["checado"]=true;
+      console.log(arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["resultado"])
+      return arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["resultado"];
+    }
+    else if (type==5){
+      if(this.state.storedIdExameUrina==-1) return "";
+      arvore[this.state.storedIdExameUrina]['exames'][this.state.storedIdExameUrina]["checado"]=true;
+      return arvore[this.state.storedIdExameUrina]['exames'][this.state.storedIdExameUrina]["resultado"];
     }
 
   }
 
-  _clickExam(){
+  //Roda ao clicar em algum exame
+  async _clickExam(){
     let selectedId = this.state.selectedId;
     let indexExam = this.state.indexExam;
     if (selectedId==-1) return;
     //Retorno em texto
     if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==0){
-      console.log(arvore[this.state.selectedId]['exames'][indexExam]["checado"])
       this.setState({
         dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"]
       });
       arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
-      console.log(arvore[this.state.selectedId]['exames'][indexExam]["checado"])
     }
+    //Retorno em audio
     else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==1){
+      if(this.state.selectedId==1 && indexExam==0){
+        arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
+        this.setState({
+          dialog:"Auscultando"
+        });
+        // await soundObject.loadAsync(require('./js/res/heartbeat.mp3'));
+        // await soundObject.playAsync();
+      }
+    }
+    else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==2){
+      this.setState({
+        storedIndexRaioXExame:indexExam,
+        storedIdRaioXExame: selectedId,
+        dialog:"Utilize o cartão de exame de raio-X"
+    });
+    }
+    else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==3){
       this.setState({
         storeIndexImagemExame:indexExam,
         storedIdImagemExame: selectedId,
         dialog:"Utilize o cartão de exame de imagem"
     });
     }
+    else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==4){
+      this.setState({
+        storeIndexExameSangue:indexExam,
+        storedIdExameSangue: selectedId,
+        dialog:"Utilize o cartão de exame de sangue"
+    });
+    }
+    else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==5){
+      this.setState({
+        storeIndexExameUrina:indexExam,
+        storedIdExameUrina: selectedId,
+        dialog:"Utilize o cartão de exame de urina"
+    });
+    }
+  }
+
+  //Algoritmo de calculo dos pontos
+  _calculatePoints(){
+      var precisionTotal = 0;
+      var precisionAcquired = 0;
+      var points = 0;
+      var errorList = [];
+      var exames = {
+        0:0,
+        1:0,
+        2:5,
+        3:8,
+        4:6,
+        5:4,
+      }
+      for (var i=0; i<=Object.keys(arvore).length-1;i++){
+        for (var j=0; j<=Object.keys(arvore[i]["dialogos"]).length-1;j++){
+          let obj = arvore[i]["dialogos"][j];
+          precisionTotal+=obj["precisao"];
+          console.log(obj)
+          if (obj["checado"]) precisionAcquired+=obj["precisao"];
+          else if(obj["precisao"]>0) errorList.push(obj["erro"]);
+        }
+        for (var j=0; j<=Object.keys(arvore[i]["exames"]).length-1;j++){
+          let obj = arvore[i]["exames"][j];
+          precisionTotal+=obj["precisao"];
+          if (obj["checado"] ) {
+            precisionAcquired+=obj["precisao"];
+            points+=exames[obj["tipo"]]
+          }
+          else if(obj["precisao"]>0 && (obj["tipo"]==0 || obj["tipo"]==1)) errorList.push(obj["erro"]);
+        }
+      }
+      precisionAcquired= (precisionAcquired*100)/precisionTotal;
+      points = precisionAcquired-points;
+      this.setState({pointsCalculated:1,
+        precisionAcquired:precisionAcquired,
+        points:points,
+        precisionTotal:precisionTotal,
+        errorList:errorList,
+      });
+  }
+
+  //Gera a ultima tela (score e erros) 
+  _renderLastScreen(){
+    return (
+      <View style={{ flex: 1 }}>
+      {this.state.doencaSelecionada=="Lúpus eritematoso sistêmico"?
+      <View>
+        <Text style={{fontSize:45,textAlign:"center", color:"green"}}>Você acertou!</Text>  
+        <Text style={{fontSize:25,textAlign:"center"}}>Precisão do diagnostico: {Math.round(this.state.precisionAcquired)}%</Text>  
+        <Text style={{fontSize:25,textAlign:"center"}}>Pontos: {Math.round(this.state.points)}</Text>
+      </View>
+      :
+      <View>
+        <Text style={{fontSize:45,textAlign:"center", color:"red"}}>Você errou!</Text>  
+        <Text style={{fontSize:25,textAlign:"center"}}>Proximidade do diagnostico: {Math.round(this.state.precisionAcquired)}%</Text>  
+        <Text style={{fontSize:25,textAlign:"center"}}>Pontos: 0</Text>
+      </View>
+    }
+
+<DialogButton
+                text="CANCEL"
+                bordered
+                onPress={() => {
+                  this.setState({ isModalVisible: false });
+                }}
+                key="button-1"
+              />
+
+      </View>
+    )
   }
 }
 
