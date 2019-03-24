@@ -9,7 +9,8 @@ import {
   Dimensions,
   Image,
   Picker,
-  TouchableOpacity
+  TouchableOpacity,
+  Button
 } from 'react-native';
 
 
@@ -291,8 +292,7 @@ export default class App extends Component{
   }
 
   async _clickExamArrow(up){
-    console.log("aq")
-    up?console.log("up"):console.log("Down");
+
     //0: baixo, 1: cima
     lastId = this.state.lastExamId;
     selectedId = this.state.selectedId;
@@ -301,27 +301,22 @@ export default class App extends Component{
         indexExam : 0,
       })
     }
-    console.log(this.state.selectedId)
+
     if (this.state.selectedId==-1) return;
     let newIndex = this.state.indexExam;
-    console.log(this.state.indexExam)
     if (up) newIndex++;
     else newIndex--;
-    console.log(newIndex)
     if (newIndex>=(Object.keys(arvore[this.state.selectedId]['exames']).length)){
       await this.setState({
         indexExam: 0
       });
-      console.log("aq1")
       newIndex=0;
     }
     if (newIndex<=-1){
       await this.setState({
         indexExam: Object.keys(arvore[this.state.selectedId]['exames']).length-1
       });
-      console.log("aq2")
       newIndex=Object.keys(arvore[this.state.selectedId]['exames']).length-1;
-      console.log(newIndex)
     }
     let text = "";
     if (this.state.selectedId != -1){
@@ -429,8 +424,6 @@ export default class App extends Component{
     this.setState({
       dialog:"Exame realizado."
     })
-    console.log("AAAAAAAAAAAAAAAAA")
-    console.log(type)
     if (type==2){
       if(this.state.storedIdRaioXExame==-1) return "";
       arvore[this.state.storedIdRaioXExame]['exames'][this.state.storedIndexRaioXExame]["checado"]=true;
@@ -439,13 +432,11 @@ export default class App extends Component{
     else if (type==3){
       if(this.state.storedIdImagemExame==-1) return "";
       arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["checado"]=true;
-      console.log(arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["resultado"])
       return arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["resultado"];
     }
     else if (type==4){
       if(this.state.storedIdExameSangue==-1) return "";
       arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["checado"]=true;
-      console.log(arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["resultado"])
       return arvore[this.state.storedIdExameSangue]['exames'][this.state.storeIndexExameSangue]["resultado"];
     }
     else if (type==5){
@@ -527,7 +518,6 @@ export default class App extends Component{
         for (var j=0; j<=Object.keys(arvore[i]["dialogos"]).length-1;j++){
           let obj = arvore[i]["dialogos"][j];
           precisionTotal+=obj["precisao"];
-          console.log(obj)
           if (obj["checado"]) precisionAcquired+=obj["precisao"];
           else if(obj["precisao"]>0) errorList.push(obj["erro"]);
         }
@@ -568,16 +558,6 @@ export default class App extends Component{
         <Text style={{fontSize:25,textAlign:"center"}}>Pontos: 0</Text>
       </View>
     }
-
-<DialogButton
-                text="CANCEL"
-                bordered
-                onPress={() => {
-                  this.setState({ isModalVisible: false });
-                }}
-                key="button-1"
-              />
-
       </View>
     )
   }

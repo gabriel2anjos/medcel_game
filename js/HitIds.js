@@ -83,7 +83,7 @@ export let arvore = {
                 exame:"Realizar exame de imagem do tórax",
                 erro:"Um exame de imagem do torax denunciaria pericardite, dando mais precisão ao diagnostico.",
                 tipo:3,
-                resultado:"/res/heart/heart.obj",
+                resultado:"./res/heart/heart.obj",
                 precisao:2,
                 no:3,
                 no_pai:-1,

@@ -86,12 +86,12 @@ export default class ARMedicalView extends Component {
               {this.state.patientPosition==0?this._renderSitting():null}
             </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3)});this.setState({cardActive:3});console.log("card imagem")}}>
+            <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3),cardActive:3})}}>
             <ViroNode>
               {this.state.exameImagemSource=="./res/heart/heart.obj"&&this.state.cardActive==3?
               <Viro3DObject
               source={require("./res/heart/heart.obj")}
-              scale={[0.4,0.4,0.4]}
+              scale={[0.6,0.6,0.6]}
               position={[0,0.4,0]}
               type='OBJ'
               ignoreEventHandling={true}
@@ -100,14 +100,14 @@ export default class ARMedicalView extends Component {
             :null}
             </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2)});this.setState({cardActive:2});console.log("card raiox")}}>
+            <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2)});this.setState({cardActive:2});}}>
             {/* <ViroNode>
               {this.state.exameImagemSource=="./res/osso.png"?
               
             :null}
             </ViroNode> */}
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_sangue"} onAnchorFound={()=>{this.setState({exameSangueSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4});console.log("card sangue")}}>
+            <ViroARImageMarker target={"logo_sangue"} onAnchorFound={()=>{this.setState({exameSangueSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4});}}>
             <ViroNode>
               {this.state.cardActive==4?
                 <ViroImage
@@ -121,7 +121,7 @@ export default class ARMedicalView extends Component {
             :null}
             </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_urina"} onAnchorFound={()=>{this.setState({exameUrinaSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(5)});this.setState({cardActive:5});console.log("card urina")}}>
+            <ViroARImageMarker target={"logo_urina"} onAnchorFound={()=>{this.setState({exameUrinaSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(5)});this.setState({cardActive:5});}}>
             <ViroNode>
               {this.state.cardActive==5?
                 <ViroImage
