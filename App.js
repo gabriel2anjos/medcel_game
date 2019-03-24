@@ -7,16 +7,34 @@ import {
   PixelRatio,
   TouchableHighlight,
   Dimensions,
-  Image
+  Image,
+  TouchableOpacity
 } from 'react-native';
 
 import {
   ViroARSceneNavigator
 } from 'react-viro';
 import {arvore} from './js/HitIds'
+
+import {FinalScore} from './js/FinalScore'
+
 import ButtonComponent from './js/Component/ButtonComponent';
+import Dialog, {
+  DialogTitle,
+  DialogContent,
+  DialogFooter,
+  DialogButton,
+  SlideAnimation,
+  ScaleAnimation,
+} from 'react-native-popup-dialog';
+// import {createStackNavigator, createAppContainer} from 'react-navigation';
 
+// const MainNavigator = createStackNavigator({
+//   Home: {screen: HomeScreen},
+//   FinalScore: {screen : FinalScore}
+// });
 
+// const App = createAppContainer(MainNavigator);
 
 
 
@@ -28,7 +46,7 @@ var sharedProps = {
 var InitialARScene = require('./js/ARMedicalView');
 
 
-export default class App extends Component{
+export default class HomeScreen extends Component{
   constructor(props) {
     super(props);
     this.state = {
@@ -47,6 +65,7 @@ export default class App extends Component{
       selectedId:-1,
       indexDialog:0,
       lastDialogId:0,
+      isModalVisible: false,
       startedGame:1,
       buttonWasClicked:0,
       idButtonClicked:-1,
@@ -95,6 +114,54 @@ export default class App extends Component{
     return(
       <View style={{ flex: 1 }}>
         {this._initialARView()}
+        <Dialog
+          onDismiss={() => {
+            this.setState({ defaultAnimationDialog: false });
+          }}
+          width={0.9}
+          visible={this.state.isModalVisible}
+          rounded
+          actionsBordered
+          onTouchOutside={() => {
+            this.setState({ isModalVisible: false });
+          }}
+          dialogTitle={
+            <DialogTitle
+              title="Concluir exame"
+              style={{
+                backgroundColor: '#F7F7F8',
+              }}
+              hasTitleBar={false}
+              align="center"
+            />
+          }
+          footer={
+            <DialogFooter>
+              <DialogButton
+                text="CANCEL"
+                bordered
+                onPress={() => {
+                  this.setState({ isModalVisible: false });
+                }}
+                key="button-1"
+              />
+              <DialogButton
+                text="Finalizar"
+                bordered
+                onPress={() => navigate('FinalScore')}
+                key="button-2"
+              />
+            </DialogFooter>
+          }
+        >
+          <DialogContent
+            style={{
+              backgroundColor: '#F7F7F8',
+            }}
+          >
+            <Text style={{color:"black", fontFamily:"Roboto",textAlign:"center"}}>Já sabe o diagnóstico? Clique em concluir para terminar o exame!</Text>
+          </DialogContent>
+        </Dialog>
       </View>
     )
   }
@@ -142,7 +209,9 @@ export default class App extends Component{
       })
     
   }
-
+  
+  _toggleModal = () =>
+  this.setState({ isModalVisible: !this.state.isModalVisible });
 
 
   async _changeDialogText(){
@@ -256,6 +325,14 @@ export default class App extends Component{
       </View>
       
       <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',left:10, bottom:30, width:70, height:160, flex:1}}>
+      {this.state.patientPosition==1?<ButtonComponent key="terminar"
+            buttonState={'off'}
+            stateImageArray={[require("./js/res/checkbox.png"), require("./js/res/checkbox.png")]}
+            style={styles.screenIcon} selected={true}
+            onPress={()=>{
+              this.setState({isModalVisible:true})
+            }}
+        />:null}
       {this.state.hoveringObject!=0?<ButtonComponent key="clicar"
             buttonState={'off'}
             stateImageArray={[require("./js/res/click.png"), require("./js/res/click.png")]}
