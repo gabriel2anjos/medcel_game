@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 
 import HitboxObject from './Component/HitboxObject';
 
-import {hitboxIds} from './HitIds'
+import {arvore} from './HitIds'
 
 import {
   ViroARScene,
@@ -21,8 +21,10 @@ import {
   ViroARPlaneSelector,
   ViroFlexView,
   ViroOmniLight,
-  ViroBox
+  ViroBox,
+  ViroQuad
 } from 'react-viro';
+
 
 export default class ARMedicalView extends Component {
 
@@ -35,8 +37,13 @@ export default class ARMedicalView extends Component {
           animationName:"mixamo.com",
           modelAnim: false,
           loopState:false,
-          patientPosition:1, //0= sentado, 1= em pe, 2= deitado
+          patientPosition:0, //0= sentado, 1= em pe, 2= deitado
           alterPosition:0,
+          exameImagemSource:"",
+          exameRaioXSource:"",
+          exameSangueSource:"",
+          exameUrinaSource:"",
+          cardActive:-1,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -52,10 +59,22 @@ export default class ARMedicalView extends Component {
         return (
           <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} >
           <ViroNode scale={[1,1,1]} >
-          <ViroAmbientLight
+          {/* <ViroOmniLight
               color="#ffffff"
-              intensity={250}
+              intensity={1000}
+              position={[0,0.5,0]}
           />
+          <ViroOmniLight
+              color="#ffffff"
+              intensity={800}
+              position={[0,0.5,-0.4]}
+          /> */}
+          <ViroAmbientLight
+          color="#ffffff"
+          intensity={1000}
+          />
+          
+          
             
             {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}>  */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
@@ -66,14 +85,24 @@ export default class ARMedicalView extends Component {
               {this.state.patientPosition==2?this._renderResting():null}
               {this.state.patientPosition==0?this._renderSitting():null}
             </ViroNode>
-              </ViroARImageMarker>
+            </ViroARImageMarker>
               {/* </ViroARPlaneSelector> */}
-              <ViroARImageMarker target={"logo_v"}>
+            <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4})}}>
             <ViroNode>
+              {this.state.exameImagemSource=="./res/heart/heart.obj"?
+              <Viro3DObject
+              source={require("./res/heart/heart.obj")}
+              scale={[0.4,0.4,0.4]}
+              position={[0,1,0]}
+              type='OBJ'
+              ignoreEventHandling={true}
+              materials={"heart"}
+            />
+            :null}
             </ViroNode>
-              </ViroARImageMarker>
-              </ViroNode>
-          </ViroARScene>
+            </ViroARImageMarker>
+            </ViroNode>
+        </ViroARScene>
         );
     }
     _renderResting(){
@@ -93,7 +122,7 @@ export default class ARMedicalView extends Component {
               ref={ "person"}
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-              materials={"pbr"}
+              materials={["blinn"]}
             />
         </ViroNode>
       )
@@ -116,7 +145,7 @@ export default class ARMedicalView extends Component {
               ref={ "person"}
               ignoreEventHandling={true}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-              materials={"pbr"}
+              materials={["blinn"]}
             />
             
         </ViroNode>
@@ -137,7 +166,7 @@ export default class ARMedicalView extends Component {
           ref={ "person"}
           ignoreEventHandling={true}
           animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-          materials={"pbr"}
+          materials={["blinn"]}
           />
           {this._renderHitBoxesIdle()}
         </ViroNode>
@@ -151,13 +180,13 @@ export default class ARMedicalView extends Component {
           <HitboxObject
             scale={[0.05,0.05,0.05]}
             position={[-0.01,0.36,0]}
-            name={hitboxIds[0]['name']}
+            name={arvore[0]['name']}
             onCollision={(a)=> this._onHover(a, 0)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,0.01]}
-            name={hitboxIds[1]['name']}
+            name={arvore[1]['name']}
             onCollision={(a)=> this._onHover(a, 1)}
           />
           <HitboxObject
@@ -169,19 +198,19 @@ export default class ARMedicalView extends Component {
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.3,-0.01]}
-            name={hitboxIds[3]['name']}
+            name={arvore[3]['name']}
             onCollision={(a)=> this._onHover(a, 3)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,0.01]}
-            name={hitboxIds[2]['name']}
+            name={arvore[2]['name']}
             onCollision={(a)=> this._onHover(a, 2)}
           />
           <HitboxObject
             scale={[0.07,0.05,0.01]}
             position={[0.0,0.23,-0.01]}
-            name={hitboxIds[3]['name']}
+            name={arvore[3]['name']}
             onCollision={(a)=> this._onHover(a, 3)}
           />
           <HitboxObject
@@ -193,13 +222,13 @@ export default class ARMedicalView extends Component {
           <HitboxObject
             scale={[0.023,0.1,0.023]}
             position={[-0.005,0.10,0.0]}
-            name={hitboxIds[4]['name']}
+            name={arvore[4]['name']}
             onCollision={(a)=> this._onHover(a, 4)}
           />
           <HitboxObject
             scale={[0.023,0.1,0.023]}
             position={[0.045,0.10,0.0]}
-            name={hitboxIds[4]['name']}
+            name={arvore[4]['name']}
             onCollision={(a)=> this._onHover(a, 4)}
           />
         </ViroNode>
@@ -297,12 +326,13 @@ export default class ARMedicalView extends Component {
     _renderWalls(){
       return(
         <ViroNode>
-        <ViroImage
+        <ViroQuad
                 height={.80}
                 width={.80}
-                source={require("./res/floor.jpg")}
+                materials={["floor"]}
                 position={[0,0.0,0]}
                 rotation={[270,0,0]}
+                arShadowReceiver={true}
               />
               <ViroImage
                 height={.40}
@@ -310,6 +340,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/wall.png")}
                 position={[0,0.2,-0.4]}
                 rotation={[0,0,0]}
+                materials={["blinn"]}
               />
               <ViroImage
                 height={.40}
@@ -317,6 +348,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/wall.png")}
                 position={[0.4,0.2,0]}
                 rotation={[0,270,0]}
+                materials={["blinn"]}
               />
               <ViroImage
                 height={.40}
@@ -324,6 +356,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/wall.png")}
                 position={[-0.4,0.2,0]}
                 rotation={[0,90,0]}
+                materials={["blinn"]}
               />
               <ViroImage
                 height={.40}
@@ -331,6 +364,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/wall.png")}
                 position={[0,0.2,0.4]}
                 rotation={[0,180,0]}
+                materials={["blinn"]}
               />
               <ViroImage
                 height={0.2}
@@ -338,6 +372,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/window.png")}
                 position={[-0.2,0.24,-0.3999]}
                 rotation={[0,0,0]}
+                materials={["blinn"]}
               />
               
               <ViroImage
@@ -346,6 +381,7 @@ export default class ARMedicalView extends Component {
                 source={require("./res/medcellogo.png")}
                 position={[0.3999,0.2,0]}
                 rotation={[0,-90,0]}
+                materials={["blinn"]}
               />
               </ViroNode>
       )
@@ -374,10 +410,8 @@ export default class ARMedicalView extends Component {
               scale={[0.0033,0.0033,0.0033]}
               position={[posCama[0],posCama[1],posCama[2]]}
               type='OBJ'
-              ref={ "person"}
               ignoreEventHandling={true}
-              animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
-              materials={"pbr"}
+              
               />
             
             {this.state.patientPosition != 2?<ViroBox
@@ -421,6 +455,17 @@ ViroMaterials.createMaterials({
   pbr: {
     lightingModel: "PBR",
   },
+  blinn: {
+    lightingModel: "Blinn",
+  },
+  floor: {
+    lightingModel: "Blinn",
+    diffuseTexture: require('./res/floor.jpg'),
+  },
+  bed: {
+    lightingModel: "Blinn",
+    // diffuseTexture: require('./res/folding_bed/Chrmwarp.jpg'),
+  },
   heart: {
     lightingModel: "Blinn",
     diffuseTexture: require('./res/heart/Heart_D3.jpg'),
@@ -436,10 +481,25 @@ ViroARTrackingTargets.createTargets({
       orientation : "Up",
       physicalWidth : 0.200 // real world width in meters
     },
-    logo_v : {
-      source : require('./res/logo_v.png'),
+    logo_sangue : {
+      source : require('./res/qrcodes/Medcel_AR_Base.png'),
       orientation : "Up",
-      physicalWidth : 0.125 // real world width in meters
+      physicalWidth : 0.200 // real world width in meters
+    },
+    logo_imagem : {
+      source : require('./res/qrcodes/Medcel_AR_Imagem.png'),
+      orientation : "Up",
+      physicalWidth : 0.200 // real world width in meters
+    },
+    logo_urina : {
+      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      orientation : "Up",
+      physicalWidth : 0.200 // real world width in meters
+    },
+    logo_raiox : {
+      source : require('./res/qrcodes/Medcel_AR_Base.png'),
+      orientation : "Up",
+      physicalWidth : 0.200 // real world width in meters
     },
   });
 

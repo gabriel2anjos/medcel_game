@@ -1,4 +1,4 @@
-export const hitboxIds = {
+export const arvore = {
     0:{
         name:'Cabeça',
         dialogos:{
@@ -85,7 +85,7 @@ export const hitboxIds = {
                 exame:"Relizar ultrassonografia",
                 erro:"Não era necessário realizar uma ultrassonografia.",
                 tipo:1,
-                resultado:"../aa/aa/aa",
+                resultado:"./res/heart/heart.obj",
                 pontuacao: 0,
                 precisao:0,
                 no:3,
@@ -128,6 +128,20 @@ export const hitboxIds = {
             0:{
                 fala:"Minhas articulações doem muito quando me movimento.",
             }
+        },
+        exames:{
+            0:{
+                exame:"Realizar ausculta",
+                erro:"Uma ausculta pulmonar te ajudaria a ter um diagnostico mais preciso.",
+                tipo:2,
+                resultado:"../aa/aa/aa",
+                pontuacao: 0,
+                precisao:4,
+                no:3,
+                no_pai:-1,
+                checado: false,
+            },
+            
         }
     },
 }

@@ -13,8 +13,9 @@ import {
 import {
   ViroARSceneNavigator
 } from 'react-viro';
-import {hitboxIds} from './js/HitIds'
+import {arvore} from './js/HitIds'
 import ButtonComponent from './js/Component/ButtonComponent';
+
 
 
 
@@ -40,7 +41,8 @@ export default class App extends Component{
         clickClear: this._clickClearVar,
         getButtonState: this._getButtonState,
         hoverObject: (a)=>this.setState({hoveringObject:a,}),
-        setPos: (a)=>this.setState({patientPosition:a,}),
+        cardImagem: "",
+        cardPlayed : ()=>this._cardPlayed(),
       },
       selectedId:-1,
       indexDialog:0,
@@ -48,20 +50,26 @@ export default class App extends Component{
       startedGame:1,
       buttonWasClicked:0,
       idButtonClicked:-1,
-      patientPosition:0,
+      patientPosition:1,
       arrowsVisible:false,
       hoveringObject:0,
       indexExam:0,
-      lastExam:0,
+      lastExamId:0,
+      storedIdImagemExame:-1,
+      storeIndexImagemExame:-1,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
     this._changeHoverText = this._changeHoverText.bind(this);
     this._changeSelectedID = this._changeSelectedID.bind(this)
     this._changeDialogText = this._changeDialogText.bind(this);
+    this._clickExamArrow = this._clickExamArrow.bind(this);
+    this._changeExamText = this._changeExamText.bind(this);
     this._passClick = this._passClick.bind(this);
     this._getButtonState = this._getButtonState.bind(this);
     this._ARScene = React.createRef();
+    this._clickExam = this._clickExam.bind(this);
+    this._cardPlayed = this._cardPlayed.bind(this);
   }
 
   render() {
@@ -73,7 +81,7 @@ export default class App extends Component{
         <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:30, width:70, height:160, flex:1}}>
         <ButtonComponent key="button1"
             buttonState={'off'}
-            stateImageArray={[require("./js/res/arrow.png"), require("./js/res/stethos.png")]}
+            stateImageArray={[require("./js/res/arrow.png"), require("./js/res/arrow.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
               setTimeout(()=>{this.setState({startedGame:1})},1000);
@@ -103,7 +111,7 @@ export default class App extends Component{
         {this._overlayView()}
         <View style={styles.centerTextView}>
           <Text style={styles.centerText}> {this.state.centerText}</Text>
-          {this.patientPosition==2?<Text style={styles.centerExamText}> teste</Text>:null}
+          {this.state.patientPosition==2?<Text style={styles.centerExamText}>{this.state.exam}</Text>:null}
         </View>
         <View style={styles.textBoxContainer}>
           <View style={styles.textBox}>
@@ -127,7 +135,7 @@ export default class App extends Component{
     id = this.state.selectedId;
 
       if (id != -1){
-        text = hitboxIds[id]['name']
+        text = arvore[id]['name']
       }
       this.setState({
         centerText : text,
@@ -147,14 +155,14 @@ export default class App extends Component{
       })
     }
 
-    if (this.state.indexDialog>=(Object.keys(hitboxIds[this.state.selectedId]['dialogos']).length)){
+    if (this.state.indexDialog>=(Object.keys(arvore[this.state.selectedId]['dialogos']).length)){
       await this.setState({
         indexDialog: 0
       });
     }
     let text = "";
     if (this.state.selectedId != -1){
-      text = hitboxIds[this.state.selectedId]['dialogos'][this.state.indexDialog]['fala'];
+      text = arvore[this.state.selectedId]['dialogos'][this.state.indexDialog]['fala'];
     }
     let newIndex = this.state.indexDialog + 1;
 
@@ -164,6 +172,66 @@ export default class App extends Component{
     })
   }
 
+  async _changeExamText(){
+    lastId = this.state.lastExamId;
+    selectedId = this.state.selectedId;
+    if ((lastId != selectedId) && selectedId!=-1){
+      await this.setState({
+        lastExamId : selectedId,
+        indexExam : 0,
+        exam: arvore[this.state.selectedId]['exames'][0]['exame']
+      })
+    }
+    else if(selectedId==-1){
+      this.setState({
+        exam: ""
+      })
+    }
+  }
+
+  async _clickExamArrow(up){
+    console.log("aq")
+    up?console.log("up"):console.log("Down");
+    //0: baixo, 1: cima
+    lastId = this.state.lastExamId;
+    selectedId = this.state.selectedId;
+    if (lastId != selectedId){
+      await this.setState({
+        indexExam : 0,
+      })
+    }
+    console.log(this.state.selectedId)
+    if (this.state.selectedId==-1) return;
+    let newIndex = this.state.indexExam;
+    console.log(this.state.indexExam)
+    if (up) newIndex++;
+    else newIndex--;
+    console.log(newIndex)
+    if (newIndex>=(Object.keys(arvore[this.state.selectedId]['exames']).length)){
+      await this.setState({
+        indexExam: 0
+      });
+      console.log("aq1")
+      newIndex=0;
+    }
+    if (newIndex<=-1){
+      await this.setState({
+        indexExam: Object.keys(arvore[this.state.selectedId]['exames']).length-1
+      });
+      console.log("aq2")
+      newIndex=Object.keys(arvore[this.state.selectedId]['exames']).length-1;
+      console.log(newIndex)
+    }
+    let text = "";
+    if (this.state.selectedId != -1){
+      text = arvore[this.state.selectedId]['exames'][newIndex]['exame'];
+    }
+
+    this.setState({
+      exam : text,
+      indexExam: newIndex
+    })
+  }
 
   _buttonComponents(){
     return(
@@ -174,6 +242,7 @@ export default class App extends Component{
             stateImageArray={[require("./js/res/stethos.png"), require("./js/res/stethos.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
+              this._clickExam();
             }}
         />
         <ButtonComponent key="conversar"
@@ -200,18 +269,20 @@ export default class App extends Component{
               }
             }}
         />:null}
-      {this.state.arrowsVisible?<ButtonComponent key="setacima"
+      {this.state.patientPosition==2?<ButtonComponent key="setacima"
             buttonState={'off'}
             stateImageArray={[require("./js/res/arrowmenuup.png"), require("./js/res/arrowmenuup.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
+              this._clickExamArrow(true);
             }}
         />:null}
-        {this.state.arrowsVisible?<ButtonComponent key="setabaixo"
+        {this.state.patientPosition==2?<ButtonComponent key="setabaixo"
             buttonState={'off'}
             stateImageArray={[require("./js/res/arrowmenudown.png"), require("./js/res/arrowmenudown.png")]}
             style={styles.screenIcon} selected={true}
             onPress={()=>{
+              this._clickExamArrow(false);
             }}
         />:null}
       </View>
@@ -221,9 +292,10 @@ export default class App extends Component{
 
   _changeSelectedID = (id)=>{
     this.setState({
-      selectedId:id
+      selectedId:id 
     })
     this._changeHoverText();
+    this._changeExamText();
   }
 
   _passClick(id){
@@ -241,6 +313,38 @@ export default class App extends Component{
       idButtonClicked:-1,
     });
   return {clicked:button, id:id}
+  }
+
+  _cardPlayed(type){
+    //type=> 1 = sangue, 2 = urina, 3 = raioX, 4 = imagem
+    if (type=4){
+      if(this.state.storedIdImagemExame==-1) return "";
+      arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["checado"]=true;
+      return arvore[this.state.storedIdImagemExame]['exames'][this.state.storeIndexImagemExame]["resultado"];
+    }
+
+  }
+
+  _clickExam(){
+    let selectedId = this.state.selectedId;
+    let indexExam = this.state.indexExam;
+    if (selectedId==-1) return;
+    //Retorno em texto
+    if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==0){
+      console.log(arvore[this.state.selectedId]['exames'][indexExam]["checado"])
+      this.setState({
+        dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"]
+      });
+      arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
+      console.log(arvore[this.state.selectedId]['exames'][indexExam]["checado"])
+    }
+    else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==1){
+      this.setState({
+        storeIndexImagemExame:indexExam,
+        storedIdImagemExame: selectedId,
+        dialog:"Utilize o cartão de exame de imagem"
+    });
+    }
   }
 }
 
