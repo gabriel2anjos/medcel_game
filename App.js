@@ -31,6 +31,7 @@ import Dialog, {
   SlideAnimation,
   ScaleAnimation,
 } from 'react-native-popup-dialog';
+
 // import {createStackNavigator, createAppContainer} from 'react-navigation';
 
 // const MainNavigator = createStackNavigator({
@@ -70,7 +71,7 @@ export default class App extends Component{
       indexDialog:0,
       lastDialogId:0,
       isModalVisible: false,
-      startedGame:1,
+      startedGame:0,
       buttonWasClicked:0,
       idButtonClicked:-1,
       patientPosition:1,
@@ -94,6 +95,9 @@ export default class App extends Component{
       errorList:[],
       doencas:doencas,
       doencaSelecionada:0,
+      exibeErros:false,
+      indexErros:0,
+      errorShown:""
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -109,6 +113,7 @@ export default class App extends Component{
     this._cardPlayed = this._cardPlayed.bind(this);
     this._renderLastScreen = this._renderLastScreen.bind(this);
     this._calculatePoints = this._calculatePoints.bind(this);
+    this._alteraErros = this._alteraErros.bind(this);
   }
 
   render() {
@@ -558,8 +563,71 @@ export default class App extends Component{
         <Text style={{fontSize:25,textAlign:"center"}}>Pontos: 0</Text>
       </View>
     }
+      <Button
+        onPress={this._alteraErros}
+        title="O que errei?"
+        color="red"
+      />
+      <Dialog
+          onDismiss={() => {
+            this.setState({ defaultAnimationDialog: false });
+          }}
+          width={0.9}
+          visible={this.state.exibeErros}
+          rounded
+          actionsBordered
+          onTouchOutside={() => {
+            this.setState({ exibeErros: false });
+          }}
+          dialogTitle={
+            <DialogTitle
+              title="Concluir exame"
+              style={{
+                backgroundColor: '#F7F7F8',
+              }}
+              hasTitleBar={false}
+              align="center"
+            />
+          }
+          footer={
+            <DialogFooter>
+              <DialogButton
+                text="Sair"
+                bordered
+                onPress={() => {
+                  this.setState({ exibeErros: false });
+                }}
+                key="button-1"
+              />
+              <DialogButton
+                text="Próximo"
+                bordered
+                onPress={() => {
+                  
+                  let indexNew = this.state.indexErros +1;
+                  console.log(this.state.indexErros)
+                  console.log(indexNew)
+                  console.log(this.state.errorList)
+                  this.setState({indexErros: indexNew, errorShown:this.state.errorList[indexNew]});}}
+                key="button-2"
+              />
+            </DialogFooter>
+          }
+        >
+          <DialogContent
+            style={{
+              backgroundColor: '#F7F7F8',
+            }}
+          >
+            <Text style={{color:"black", fontFamily:"Roboto",textAlign:"center"}}>{this.state.errorShown}</Text>
+          </DialogContent>
+        </Dialog>
       </View>
     )
+  }
+
+  _alteraErros(){
+    this.setState({exibeErros:!this.state.exibeErros})
   }
 }
 
@@ -585,7 +653,7 @@ const styles = StyleSheet.create({
     left: (Dimensions.get('window').width / 2),
   },
   centerText: {
-    color: '#a9a9a9',
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 18,
   },
@@ -637,11 +705,11 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
 
-    resizeMode: 'contain'
+    resizeMode: 'center'
   },
   informationText:{
     fontFamily: "Roboto",
-    color: 'grey',
+    color: 'black',
     fontWeight: '100',
     fontSize: 25,
     marginRight: 2,

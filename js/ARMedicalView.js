@@ -44,6 +44,7 @@ export default class ARMedicalView extends Component {
           exameSangueSource:"",
           exameUrinaSource:"",
           cardActive:-1,
+          pauseUpdates:false,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -59,36 +60,36 @@ export default class ARMedicalView extends Component {
         return (
           <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} >
           <ViroNode scale={[1,1,1]} >
-          {/* <ViroOmniLight
+          {/* /* <ViroOmniLight
               color="#ffffff"
               intensity={1000}
               position={[0,0.5,0]}
-          />
-          <ViroOmniLight
-              color="#ffffff"
-              intensity={800}
-              position={[0,0.5,-0.4]}
           /> */}
+           {/* <ViroOmniLight
+               color="#ffffff"
+               intensity={800}
+               position={[0,0.2,0.0]}
+          />  */}
           <ViroAmbientLight
           color="#ffffff"
           intensity={1000}
-          />
+          /> 
           
           
             
             {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}>  */}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
-            <ViroNode>
+            {this.state.pauseUpdates?<ViroNode>
               {this._renderWalls()}
               {this._renderObjects()}
               {this.state.patientPosition==1?this._renderIdle():null}
               {this.state.patientPosition==2?this._renderResting():null}
               {this.state.patientPosition==0?this._renderSitting():null}
-            </ViroNode>
+            </ViroNode>:null}
             </ViroARImageMarker>
             <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3),cardActive:3})}}>
             <ViroNode>
-              {this.state.exameImagemSource=="./res/heart/heart.obj"&&this.state.cardActive==3?
+              {this.state.cardActive==3?
               <Viro3DObject
               source={require("./res/heart/heart.obj")}
               scale={[0.6,0.6,0.6]}
@@ -100,20 +101,27 @@ export default class ARMedicalView extends Component {
             :null}
             </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2)});this.setState({cardActive:2});}}>
-            {/* <ViroNode>
-              {this.state.exameImagemSource=="./res/osso.png"?
-              
+            <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2),cardActive:2})}}>
+            <ViroNode>
+              {this.state.cardActive==2?
+              <ViroImage
+              height={.20}
+              width={.20}
+              source={require("./res/raioxtorax.jpg")}
+              position={[0,0.6,0]}
+              rotation={[0,0,0]}
+              materials={["blinn"]}
+            />
             :null}
-            </ViroNode> */}
+            </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_sangue"} onAnchorFound={()=>{this.setState({exameSangueSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4)});this.setState({cardActive:4});}}>
+            <ViroARImageMarker target={"logo_sangue"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(4),cardActive:4})}}>
             <ViroNode>
               {this.state.cardActive==4?
                 <ViroImage
                 height={.20}
                 width={.20}
-                source={require("./res/wall.png")}
+                source={require("./res/6zwt44.png")}
                 position={[0,0.6,0]}
                 rotation={[0,0,0]}
                 materials={["blinn"]}
@@ -121,13 +129,13 @@ export default class ARMedicalView extends Component {
             :null}
             </ViroNode>
             </ViroARImageMarker>
-            <ViroARImageMarker target={"logo_urina"} onAnchorFound={()=>{this.setState({exameUrinaSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(5)});this.setState({cardActive:5});}}>
+            <ViroARImageMarker target={"logo_urina"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(5),cardActive:5})}}>
             <ViroNode>
               {this.state.cardActive==5?
                 <ViroImage
                 height={.20}
                 width={.20}
-                source={require("./res/wall.png")}
+                source={require("./res/exameurina.png")}
                 position={[0,0.6,0]}
                 rotation={[0,0,0]}
                 materials={["blinn"]}
@@ -288,7 +296,7 @@ export default class ARMedicalView extends Component {
         }
 
         )
-      }}, 300)
+      }}, 650)
     }
     _detectButton(){
       setInterval(() => {
@@ -309,7 +317,7 @@ export default class ARMedicalView extends Component {
           patientPosition:2,
         })
       }
-    }, 500)
+    }, 700)
     }
 
     _onHover(isHovering, elemento){
@@ -355,6 +363,7 @@ export default class ARMedicalView extends Component {
     }
 
     _onAnchorFound(){
+      setTimeout(()=>{this.setState({pauseUpdates:true})},3000);
       this._startRay();
     }
     _renderWalls(){
@@ -368,7 +377,7 @@ export default class ARMedicalView extends Component {
                 rotation={[270,0,0]}
                 arShadowReceiver={true}
               />
-              <ViroImage
+              {/* <ViroImage
                 height={.40}
                 width={.80}
                 source={require("./res/wall.png")}
@@ -415,8 +424,8 @@ export default class ARMedicalView extends Component {
                 source={require("./res/medcellogo.png")}
                 position={[0.3999,0.2,0]}
                 rotation={[0,-90,0]}
-                materials={["blinn"]}
-              />
+                materials={["blinn"]} */}
+              {/* /> */}
               </ViroNode>
       )
     }
@@ -435,6 +444,7 @@ export default class ARMedicalView extends Component {
               rotation={[0,0,0]}
               position={[posCadeira[0],posCadeira[1],posCadeira[2]]}
               type='OBJ'
+
             />
             <Viro3DObject
               source={require('./res/folding_bed/Folding_Bed.obj')}

@@ -61,7 +61,7 @@ export let arvore = {
                 exame:"Realizar ausculta",
                 erro:"Uma ausculta cardíaca poderia indicar pericardite, e te ajudaria a ter um diagnostico mais preciso.",
                 tipo:1,
-                resultado:"../aa/aa/aa",
+                resultado:"Ausculta realizada",
                 
                 precisao:4,
                 no:3,
@@ -72,7 +72,7 @@ export let arvore = {
                 exame:"Realizar raio-X do tórax",
                 erro:"Um raio-X do torax denunciaria pericardite, dando mais precisão ao diagnostico.",
                 tipo:2,
-                resultado:"../aa/aa/aa",
+                resultado:"./res/raioxtorax.jpg",
                 
                 precisao:2,
                 no:3,
@@ -80,7 +80,7 @@ export let arvore = {
                 checado: false,
             },
             2:{
-                exame:"Realizar exame de imagem do tórax",
+                exame:"Exame de imagem cardíaco",
                 erro:"Um exame de imagem do torax denunciaria pericardite, dando mais precisão ao diagnostico.",
                 tipo:3,
                 resultado:"./res/heart/heart.obj",
@@ -107,7 +107,7 @@ export let arvore = {
                 exame:"Realizar ultrassonografia",
                 erro:"Não era necessário realizar uma ultrassonografia.",
                 tipo:1,
-                resultado:"./res/heart/heart.obj",
+                resultado:"",
                 
                 precisao:0,
                 no:3,
@@ -115,9 +115,9 @@ export let arvore = {
                 checado: false,
             },
             1:{
-                exame:"Relizar exame de urina",
+                exame:"Realizar exame de urina",
                 tipo:5,
-                resultado:"./res/heart/heart.obj",
+                resultado:"./res/exameurina.png",
                 precisao:6,
                 no:3,
                 no_pai:-1,
@@ -126,7 +126,7 @@ export let arvore = {
             2:{
                 exame:"Relizar exame de sangue",
                 tipo:4,
-                resultado:"./res/heart/heart.obj",
+                resultado:"",
                 precisao:6,
                 no:3,
                 no_pai:-1,
