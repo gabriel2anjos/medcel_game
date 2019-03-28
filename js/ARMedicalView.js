@@ -60,35 +60,34 @@ export default class ARMedicalView extends Component {
     }
     render() {
         return (
+          //Tudo no viroReact tem que rolar dentro disso. O ref é util, vai ser usado mais tarde. physics world serve pra definir
+          //algumas constantes. Gravidade não é usada no app, mas esse drawBound é util pra determinar o que vai rolar
+          //quando um raio for emitido do centro da tela, pra saber o que a biblioteca está considerando, de fato, objeto
+          //físico que pode compreender colisões
           <ViroARScene ref={(component)=>{this.cameraRef = component}} physicsWorld={{gravity: [0, -9.81, 0], drawBounds: false}} >
+          {/*ViroNode é a view do viro react. Pode ser usada só como wrap. Não recomendo mudar atributos caso tenha mta coisa dentro,
+          principalmente size. Provavelmente vai dar ruim*/}
           <ViroNode scale={[1,1,1]} >
-          {/* /* <ViroOmniLight
-              color="#ffffff"
-              intensity={1000}
-              position={[0,0.5,0]}
-          /> */}
-           {/* <ViroOmniLight
-               color="#ffffff"
-               intensity={800}
-               position={[0,0.2,0.0]}this.setState({
-          playSound:true
-        })
-          />  */}
+          {/*Luz ambiente, a que mais ilumina e ilumina tudo igual. Tamb[em é a mais artificial, mas que menos demanda
+          processamento do celular*/}
           <ViroAmbientLight
           color="#ffffff"
           intensity={1000}
           /> 
-          
-          
-            
-            {/* <ViroARPlaneSelector  onPlaneSelected={this._onAnchorFound} minHeight={.3} minWidth={.3}>  */}
+            {/*Função mto importante. Define qual alvo ele vai usar pra ancorar tudo que estiver wraped dentro dele. Os elementos
+            dentro só vao ser exibidos quando o qrcode for detectado. Além disso, toda vez q ele achar o AR, vai rodar a função _onAnchorFound.
+            Por fim, esse pause updates é importante. Ele é colocado como true quando o QR code foi encontrado e estabilizado. Se não for feito
+            isso, os componentes vao ficar sambando nessa tela*/}
             <ViroARImageMarker target={"logo"} onAnchorFound={this._onAnchorFound} pauseUpdates={this.state.pauseUpdates}>
+            {/*Como pause updates só rola dpois de 3 segundos que ele achou o qr code (pra estabilizar), eu espero esse tempo pra exibir tudo*/}
             {this.state.pauseUpdates?<ViroNode>
               {this._renderWalls()}
               {this._renderObjects()}
+              {/*Condicoes de posição do paciente na varivael, pra definir o q vai ser exibido*/}
               {this.state.patientPosition==1?this._renderIdle():null}
               {this.state.patientPosition==2?this._renderResting():null}
               {this.state.patientPosition==0?this._renderSitting():null}
+              {/*Sons que seriam tocados por causa de algum exame. Aqui, o da ausculta. Quando ela é rodada, mute vira true, e dpois de um tempinho vira false*/}
               <ViroSound paused={false}
               muted={!this.state.playSound}
               source={require('./res/heartbeat.mp3')}
@@ -97,19 +96,28 @@ export default class ARMedicalView extends Component {
               onFinish={()=>{this.setState({playSound:false})}}/>
             </ViroNode>:null}
             </ViroARImageMarker>
+            {/*Detecta o logo do exame de imagem (que, apresar do nome, é um modelo 3D do orgão/osso/algo selecionado), e nesse caso, exibe o coração. O cardActive serve pra que não apareçam na tela varios exames ao mesmo tempo,
+              apenas o do card que está sendo apontado.*/}
             <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3),cardActive:3})}}>
             <ViroNode>
               {this.state.cardActive==3?
               <Viro3DObject
+              {/*Source é o arquivo do modelo 3D*/}
               source={require("./res/heart/heart.obj")}
+              {/*Scale é um modificador de tamanho. A maioria dos modelos 3D sao gigantes e tem q ser adaptados*/}
               scale={[0.6,0.6,0.6]}
+              {/*Posicao dele nos eixos XYZ*/}
               position={[0,0.4,0]}
+              {/*Tipo, pode ser OBJ ou VRX*/}
               type='OBJ'
+              {/*Para que ele nn intercepte colisões. Só as hitboxes devem ter isso como falso*/}
               ignoreEventHandling={true}
+              {/*Material desse modelo*/}
               materials={"heart"}
             />
             :null}
             </ViroNode>
+            {/*Exame de raio X, nesse caso e nos proximos exibe uma imagem, seguindo as mesmas condicoes do acima*/}
             </ViroARImageMarker>
             <ViroARImageMarker target={"logo_raiox"} onAnchorFound={()=>{this.setState({exameRaioXSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(2),cardActive:2})}}>
             <ViroNode>
@@ -129,6 +137,7 @@ export default class ARMedicalView extends Component {
             <ViroNode>
               {this.state.cardActive==4?
                 <ViroImage
+                {/*Para imagens, ao inves de size usa height e width*/}
                 height={.20}
                 width={.20}
                 source={require("./res/6zwt44.png")}
@@ -160,6 +169,7 @@ export default class ARMedicalView extends Component {
     _renderResting(){
       const pos = [0,0,0];
       return(
+        {/*Isso aqui exibe nosso paciente deitado*/}
         <ViroNode>
             <Viro3DObject
               source={require('./res/paciente/sleeping.vrx')}
@@ -196,6 +206,8 @@ export default class ARMedicalView extends Component {
               type='VRX'
               ref={ "person"}
               ignoreEventHandling={true}
+              {/*Animações (personagem andar, respirar, etc). Nosso modelo só tem uma, como o nome "mixamo.com",
+              que foi o serviço que usei pra gerar. Recomendo fortemente ler a documentação*/}
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={["blinn"]}
             />
@@ -229,6 +241,9 @@ export default class ARMedicalView extends Component {
     _renderHitBoxesIdle(){
       return(
         <ViroNode>
+          {/*As tais das hitboxes. Quando o centro da tela aponta pra elas, elas rodam a colisão, e passam o id que elas estao associadas
+           (veja o arquivo tree. id 0 é de cabeça, 1 de torax, etc. Eu fiz um componente só pra hitbox, vale dar uma olhada. não é 
+           muito complexo, mas ai nn tinha que colocar opacity=0 pra todos*/}
           <HitboxObject
             scale={[0.05,0.05,0.05]}
             position={[-0.01,0.36,0]}
@@ -286,13 +301,16 @@ export default class ARMedicalView extends Component {
         </ViroNode>
         )
     }
-
+    //MUITO importante, e geralmente vai ser implementada sem mudar muito. É um codigo que solta um "raio" do centro da tela, no eixo normal (ou seja, indica pra onde
+    //voce esta apontando). Detecta colisão com o primeiro objeto, e chama o onCollision dele. Precisa que a cena principal tenha uma ref
     _startRay(){
       setInterval(() => {
       if (this.cameraRef) {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
             const from = orientation.position;
             const to = [orientation.forward[0]*100,orientation.forward[1]*100,orientation.forward[2]*100];
+            {/*A partir daqui, eu mesmo fiz. É pra que caso ,não ocorra colisão, examinedId vire -1 e eu
+             possa detectar que nada está no centro, então o texto que aparece no meio da tela deve ser apagado*/}
             this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>{
              if (!collision){
                 this._onHover(false)
@@ -306,8 +324,11 @@ export default class ARMedicalView extends Component {
         }
 
         )
+        //essa função tem que ser rodada a cada X tempo. 650ms é um bom intervalo.
       }}, 650)
     }
+    // A partir daqui são nojeiras consequentes do não uso de Redux. Serve para ver quando
+    // apertei algum botão
     _detectButton(){
       setInterval(() => {
       let state = this.props.arSceneNavigator.viroAppProps.getButtonState();
@@ -338,6 +359,8 @@ export default class ARMedicalView extends Component {
     }, 700)
     }
 
+
+    //Funcao simples que roda quando o raio acima detecta alguma colisao
     _onHover(isHovering, elemento){
         if (isHovering){
           this.props.arSceneNavigator.viroAppProps.changeParentID(elemento);
@@ -347,7 +370,9 @@ export default class ARMedicalView extends Component {
         }
     }
     
-
+    //Muda a posicao do personagem, caso vc tenha clicado no botao enquanto apontava  pra
+    //algum objeto, ou caso vc só esteja apontando, exibe um texto no centro da tela pra
+    //te guiar
     _alterPosition(isHovering, position){
       if (isHovering && position==0){
         this.props.arSceneNavigator.viroAppProps.changeHoverText("Pedir para sentar");
@@ -380,10 +405,13 @@ export default class ARMedicalView extends Component {
       }
     }
 
+    //Funcao que aguarda um pouco pra estabilizar a camera
     _onAnchorFound(){
       setTimeout(()=>{this.setState({pauseUpdates:true})},3000);
       this._startRay();
     }
+
+    //Antes ia ter paredes, além do chao. Nao ficava bom
     _renderWalls(){
       return(
         <ViroNode>
@@ -447,6 +475,8 @@ export default class ARMedicalView extends Component {
               </ViroNode>
       )
     }
+    
+    //Renderiza os objetos de cenario e cria suas hitboxes.
   _renderObjects(){
     const posCadeira = [-0.18,0,-0.18];
     const posCama = [0.23,0,0.04];
@@ -513,6 +543,11 @@ export default class ARMedicalView extends Component {
   }
 }
 
+//Materiais do Viro. lightiningModel é como reage à luz 
+//(nao conta no caso atual, pq usamos ambientLight). As texturas
+//são selecionadas aqui apenas em alguns casos, geralmente com
+//.obj .Nos outros, colocar em resources no componente 3D
+//ja resolve o problema
 ViroMaterials.createMaterials({
   pbr: {
     lightingModel: "PBR",
@@ -537,6 +572,8 @@ ViroMaterials.createMaterials({
   },
 });
 
+//Os QR codes e seus tamanhos (em metros) na vida real.
+//Mudar esse tamanho nao fez mta diferença, para ser honesto
 ViroARTrackingTargets.createTargets({
     logo : {
       source : require('./res/qrcodes/cardbase.png'),
