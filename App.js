@@ -20,10 +20,9 @@ import {
   ViroARSceneNavigator
 } from 'react-viro';
 
-import {arvore} from './js/HitIds'
+import {arvore} from './js/arvore'
 import {doencas} from './js/Doencas'
 
-import {FinalScore} from './js/FinalScore'
 
 import ButtonComponent from './js/Component/ButtonComponent';
 import Dialog, {

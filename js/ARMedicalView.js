@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 
 import HitboxObject from './Component/HitboxObject';
 
-import {arvore} from './tree'
+import {arvore} from './arvore'
 
 import {
   ViroARScene,
@@ -102,17 +102,17 @@ export default class ARMedicalView extends Component {
             <ViroNode>
               {this.state.cardActive==3?
               <Viro3DObject
-              {/*Source é o arquivo do modelo 3D*/}
+              /*Source é o arquivo do modelo 3D*/
               source={require("./res/heart/heart.obj")}
-              {/*Scale é um modificador de tamanho. A maioria dos modelos 3D sao gigantes e tem q ser adaptados*/}
+              /*Scale é um modificador de tamanho. A maioria dos modelos 3D sao gigantes e tem q ser adaptados*/
               scale={[0.6,0.6,0.6]}
-              {/*Posicao dele nos eixos XYZ*/}
+              /*Posicao dele nos eixos XYZ*/
               position={[0,0.4,0]}
-              {/*Tipo, pode ser OBJ ou VRX*/}
+              /*Tipo, pode ser OBJ ou VRX*/
               type='OBJ'
-              {/*Para que ele nn intercepte colisões. Só as hitboxes devem ter isso como falso*/}
+              /*Para que ele nn intercepte colisões. Só as hitboxes devem ter isso como falso*/
               ignoreEventHandling={true}
-              {/*Material desse modelo*/}
+              /*Material desse modelo*/
               materials={"heart"}
             />
             :null}
@@ -137,7 +137,7 @@ export default class ARMedicalView extends Component {
             <ViroNode>
               {this.state.cardActive==4?
                 <ViroImage
-                {/*Para imagens, ao inves de size usa height e width*/}
+                /*Para imagens, ao inves de size usa height e width*/
                 height={.20}
                 width={.20}
                 source={require("./res/6zwt44.png")}
@@ -169,7 +169,7 @@ export default class ARMedicalView extends Component {
     _renderResting(){
       const pos = [0,0,0];
       return(
-        {/*Isso aqui exibe nosso paciente deitado*/}
+        /*Isso aqui exibe nosso paciente deitado*/
         <ViroNode>
             <Viro3DObject
               source={require('./res/paciente/sleeping.vrx')}
@@ -206,8 +206,8 @@ export default class ARMedicalView extends Component {
               type='VRX'
               ref={ "person"}
               ignoreEventHandling={true}
-              {/*Animações (personagem andar, respirar, etc). Nosso modelo só tem uma, como o nome "mixamo.com",
-              que foi o serviço que usei pra gerar. Recomendo fortemente ler a documentação*/}
+              /*Animações (personagem andar, respirar, etc). Nosso modelo só tem uma, como o nome "mixamo.com",
+              que foi o serviço que usei pra gerar. Recomendo fortemente ler a documentação*/
               animation={{name:this.state.animationName, run:true, loop:true, onFinish:this._onFinish,}}
               materials={["blinn"]}
             />
@@ -309,8 +309,8 @@ export default class ARMedicalView extends Component {
         this.cameraRef.getCameraOrientationAsync().then(orientation=>{
             const from = orientation.position;
             const to = [orientation.forward[0]*100,orientation.forward[1]*100,orientation.forward[2]*100];
-            {/*A partir daqui, eu mesmo fiz. É pra que caso ,não ocorra colisão, examinedId vire -1 e eu
-             possa detectar que nada está no centro, então o texto que aparece no meio da tela deve ser apagado*/}
+            /*A partir daqui, eu mesmo fiz. É pra que caso ,não ocorra colisão, examinedId vire -1 e eu
+             possa detectar que nada está no centro, então o texto que aparece no meio da tela deve ser apagado*/
             this.cameraRef.findCollisionsWithRayAsync(from, to, true).then((collision)=>{
              if (!collision){
                 this._onHover(false)
@@ -348,14 +348,13 @@ export default class ARMedicalView extends Component {
           patientPosition:2,
         })
       }
-      let state2 = this.props.arSceneNavigator.viroAppProps.stateSound();
-      console.log(state2)
-      if(state2==true){
-        this.props.arSceneNavigator.viroAppProps.turnOffSound();
-        this.setState({
-          playSound:true
-        })
-      }
+      // let state2 = this.props.arSceneNavigator.viroAppProps.stateSound();
+      // if(state2==true){
+      //   this.props.arSceneNavigator.viroAppProps.turnOffSound();
+      //   this.setState({
+      //     playSound:true
+      //   })
+      // }
     }, 700)
     }
 
