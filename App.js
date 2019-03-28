@@ -66,6 +66,8 @@ export default class App extends Component{
         hoverObject: (a)=>this.setState({hoveringObject:a,}),
         cardImagem: "",
         cardPlayed : (a)=>this._cardPlayed(a),
+        turnOffSound : ()=>{this.setState({playSound:false},)},
+        stateSound : ()=>{return this.state.playSound}
       },
       selectedId:-1,
       indexDialog:0,
@@ -97,7 +99,8 @@ export default class App extends Component{
       doencaSelecionada:0,
       exibeErros:false,
       indexErros:0,
-      errorShown:""
+      errorShown:"",
+      playSound: false,
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -460,7 +463,8 @@ export default class App extends Component{
     //Retorno em texto
     if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==0){
       this.setState({
-        dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"]
+        dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"],
+        
       });
       arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
     }
@@ -469,7 +473,8 @@ export default class App extends Component{
       if(this.state.selectedId==1 && indexExam==0){
         arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
         this.setState({
-          dialog:"Auscultando"
+          dialog:"Auscultando",
+          playSound:true,
         });
         // await soundObject.loadAsync(require('./js/res/heartbeat.mp3'));
         // await soundObject.playAsync();
@@ -658,7 +663,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   centerExamText: {
-    color: '#a9a9a9',
+    color: 'black',
     fontWeight: 'normal',
     fontSize: 15,
   },

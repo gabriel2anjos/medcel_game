@@ -22,7 +22,8 @@ import {
   ViroFlexView,
   ViroOmniLight,
   ViroBox,
-  ViroQuad
+  ViroQuad,
+  ViroSound
 } from 'react-viro';
 
 
@@ -45,6 +46,7 @@ export default class ARMedicalView extends Component {
           exameUrinaSource:"",
           cardActive:-1,
           pauseUpdates:false,
+          playSound:true,
         };
 
         this._onHover = this._onHover.bind(this);
@@ -68,7 +70,9 @@ export default class ARMedicalView extends Component {
            {/* <ViroOmniLight
                color="#ffffff"
                intensity={800}
-               position={[0,0.2,0.0]}
+               position={[0,0.2,0.0]}this.setState({
+          playSound:true
+        })
           />  */}
           <ViroAmbientLight
           color="#ffffff"
@@ -85,6 +89,12 @@ export default class ARMedicalView extends Component {
               {this.state.patientPosition==1?this._renderIdle():null}
               {this.state.patientPosition==2?this._renderResting():null}
               {this.state.patientPosition==0?this._renderSitting():null}
+              <ViroSound paused={false}
+              muted={!this.state.playSound}
+              source={require('./res/heartbeat.mp3')}
+              loop={true}
+              volume={1.0}
+              onFinish={()=>{this.setState({playSound:false})}}/>
             </ViroNode>:null}
             </ViroARImageMarker>
             <ViroARImageMarker target={"logo_imagem"} onAnchorFound={()=>{this.setState({exameImagemSource:this.props.arSceneNavigator.viroAppProps.cardPlayed(3),cardActive:3})}}>
@@ -136,7 +146,7 @@ export default class ARMedicalView extends Component {
                 height={.20}
                 width={.20}
                 source={require("./res/exameurina.png")}
-                position={[0,0.6,0]}
+                position={[0,0.4,0]}
                 rotation={[0,0,0]}
                 materials={["blinn"]}
               />
@@ -315,6 +325,14 @@ export default class ARMedicalView extends Component {
       else if (this.state.alterPosition == 3){
         this.setState({
           patientPosition:2,
+        })
+      }
+      let state2 = this.props.arSceneNavigator.viroAppProps.stateSound();
+      console.log(state2)
+      if(state2==true){
+        this.props.arSceneNavigator.viroAppProps.turnOffSound();
+        this.setState({
+          playSound:true
         })
       }
     }, 700)
