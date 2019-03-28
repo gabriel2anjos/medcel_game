@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+
 import {
   AppRegistry,
   Text,
@@ -13,10 +14,12 @@ import {
   Button
 } from 'react-native';
 
-
+//Essa tela precisa importar pelo menos a ViroARScrenenavigator, para apresentar
+//a cena AR
 import {
   ViroARSceneNavigator
 } from 'react-viro';
+
 import {arvore} from './js/HitIds'
 import {doencas} from './js/Doencas'
 
@@ -32,18 +35,10 @@ import Dialog, {
   ScaleAnimation,
 } from 'react-native-popup-dialog';
 
-// import {createStackNavigator, createAppContainer} from 'react-navigation';
-
-// const MainNavigator = createStackNavigator({
-//   Home: {screen: HomeScreen},
-//   FinalScore: {screen : FinalScore}
-// });
-
-// const App = createAppContainer(MainNavigator);
 
 var PickerItem = Picker.Item;
 
-
+//Chave do Viro utilizada no projeto
 var sharedProps = {
   apiKey:"A96217A2-0EA6-4173-803C-ACCF333CB9F6",
 }
@@ -58,6 +53,7 @@ export default class App extends Component{
       dialog:"",
       exam:"",
       sharedProps : sharedProps,
+      //Props passados para a scene do AR, são funcoes daqui que podem ser chamadas la
       viroAppProps : {
         changeHoverText: (a)=>this.setState({centerText:a}),
         changeParentID : this._changeSelectedID,
@@ -66,8 +62,6 @@ export default class App extends Component{
         hoverObject: (a)=>this.setState({hoveringObject:a,}),
         cardImagem: "",
         cardPlayed : (a)=>this._cardPlayed(a),
-        turnOffSound : ()=>{this.setState({playSound:false},)},
-        stateSound : ()=>{return this.state.playSound}
       },
       selectedId:-1,
       indexDialog:0,
@@ -99,8 +93,7 @@ export default class App extends Component{
       doencaSelecionada:0,
       exibeErros:false,
       indexErros:0,
-      errorShown:"",
-      playSound: false,
+      errorShown:""
     };
     this._initialARView = this._initialARView.bind(this);
     this._overlayView = this._overlayView.bind(this);
@@ -120,15 +113,18 @@ export default class App extends Component{
   }
 
   render() {
+    //Serve para transformar as doencas que sao exibidas no menu final em opções no picker
       let opcoesDoencas = this.state.doencas.map( (s, i) => {
         return <Picker.Item key={i} value={s} label={s} />
     });
+    //A seguinte função exibe a tela inicial, com informações do paciente
     if(!this.state.startedGame)  return (
       <View style={{ flex: 1 }}>
         <View style={{flex: 1, width:(Dimensions.get('window').width), height: Dimensions.get('window').height, alignItems:'center'}}>
          <Image style={styles.image} source={require('./js/res/relatorio.png')}></Image>
         </View>
         <View style={{position:'absolute', flexDirection:'column', justifyContent: 'space-around',right:10, bottom:30, width:70, height:160, flex:1}}>
+        {/* Botao para avançar */}
         <ButtonComponent key="button1"
             buttonState={'off'}
             stateImageArray={[require("./js/res/arrow.png"), require("./js/res/arrow.png")]}
@@ -141,12 +137,14 @@ export default class App extends Component{
         />
         </View>
       </View>
-    );
+    )
+    //A seguinte função exibe a tela final quando finishedGame = true
     if(this.state.finishedGame)  return (
       <View style={{ flex: 1 }}>
         {this._renderLastScreen()}
       </View>
     );
+     //A seguinte função exibe a tela final
     return(
       <View style={{ flex: 1 }}>
         {this._initialARView()}
@@ -196,6 +194,7 @@ export default class App extends Component{
             }}
           >
             <Text style={{color:"black", fontFamily:"Roboto",textAlign:"center"}}>Já sabe o diagnóstico? Clique em concluir para terminar o exame!</Text>
+            {/* Picker selector da doença */}
             <Picker
               selectedValue = {this.state.doencaSelecionada}
               onValueChange = {(doenca)=>{this.setState({doencaSelecionada:doenca})}}>
@@ -210,17 +209,25 @@ export default class App extends Component{
   _initialARView(){
     return (
       <View style={{ flex: 1 }}>
+      {/* Cena inicial do AR. Aqui é onde os elementos de AR sao chamados. Ocupa, nesse caso, toda a tela.
+          initialSceme é a tela que será inicialmente chamada (no caso so tem uma), viroAppProps sao funções
+          daqui passadas para lá*/}
         <ViroARSceneNavigator {...this.state.sharedProps}
           ref={this._ARScene}
             style ={{flex:1}}
             initialScene={{scene: InitialARScene}}
             viroAppProps={this.state.viroAppProps}
       />
+        {/*Botoes e bolinha no centro da tela*/}
         {this._overlayView()}
         <View style={styles.centerTextView}>
+          {/*Texto central, exibe o nome da parte pra onde está sendo apontada a câmera*/}
           <Text style={styles.centerText}> {this.state.centerText}</Text>
+          {/*Se a posicao do paciente for 2 (em pé), ele mostra em baixo da parte apontada o nome do exame
+            atualmente selecionado*/}
           {this.state.patientPosition==2?<Text style={styles.centerExamText}>{this.state.exam}</Text>:null}
         </View>
+        {/*Caixa de diálogo*/}
         <View style={styles.textBoxContainer}>
           <View style={styles.textBox}>
             <Text style={styles.dialogText}>{this.state.dialog}</Text>
@@ -232,12 +239,14 @@ export default class App extends Component{
     )
   }
 
+  //Bolinha no centro da tela
   _overlayView(){
     return(
           <View style={styles.crosshair}/>
           )
   }
-
+  //essa funcao pega o ID do element no centro da tela (selectedId), procura ele na arvore de decisao (tree.js).
+  //e exibe o atributo "nome". Define o que vai ser mostrado no centro da tela.
   _changeHoverText(){
     let text = ""
     id = this.state.selectedId;
@@ -251,10 +260,14 @@ export default class App extends Component{
     
   }
   
+  
   _toggleModal = () =>
   this.setState({ isModalVisible: !this.state.isModalVisible });
 
-
+    // Todo o código a seguir é utilizado pra exibir todos os diálogos. Cada vez que o botao de
+    // dialogo é apertado, ele vê qual seria o próximo texto a ser exibido na lista, dentro da árvore,
+    // relativa ä parte selecionada, e exibe esse texto, marcando como checado. Acontece até que
+    // acabem os textos possíveis
   async _changeDialogText(){
     lastId = this.state.lastDialogId;
     selectedId = this.state.selectedId;
@@ -264,7 +277,6 @@ export default class App extends Component{
         indexDialog : 0,
       })
     }
-
     if (this.state.indexDialog>=(Object.keys(arvore[this.state.selectedId]['dialogos']).length)){
       await this.setState({
         indexDialog: 0
@@ -282,6 +294,8 @@ export default class App extends Component{
     })
   }
 
+  //Funciona como o acima, mas para exibir exames. Eles são selecionados usando as setinhas na esquerda,
+  //entao o esquema é meio diferente
   async _changeExamText(){
     lastId = this.state.lastExamId;
     selectedId = this.state.selectedId;
@@ -299,6 +313,8 @@ export default class App extends Component{
     }
   }
 
+  //Essa é a função que faz as setinhas funcionarem para mudar oexame na tela. Recebe true se for apertado
+  //para cima, false se for apertado para baixo.
   async _clickExamArrow(up){
 
     //0: baixo, 1: cima
@@ -337,6 +353,10 @@ export default class App extends Component{
     })
   }
 
+  //Exibe os botoes na tela. Checkbox é o botão para finalizar consulta (escolher o diagnostico e terminar). Só pé exibido com o personagem em pé.
+  //(foi uma escolha de design, pra despoluir a tela em outros exames).  Estetoscópio realiza o exame que é dito na tela. O balão de dialogo conversa
+  //com o paciente sobre a parte exibida no centro da tela. As setas selecionam o exame que será feito. O botao de clicar aparece quando você aponta
+  //para algum objeto (cadeira, cama, ponto no chao) no qual a posição do personagem pode ser mudada.
   _buttonComponents(){
     return(
       <View>
@@ -402,6 +422,7 @@ export default class App extends Component{
     )
   }
 
+  //Muda o ID selecionado (ID da hitbox no centro da tela)
   _changeSelectedID = (id)=>{
     this.setState({
       selectedId:id 
@@ -410,13 +431,17 @@ export default class App extends Component{
     this._changeExamText();
   }
 
+  //As duas seguintes sao coisa de quem não usou redux. Quando a outra cena do AR chama essas, ele vê se algum
+  //botao foi apertado através de uma flag nessa cena. Caso tenha sido, ele desativa a flag. Essas funcoes são chamadas
+  //a cada X tempo, então quando um botão é apertado aqui,os efeitos não vem "instantaneamente".
+  //Novamente, só pq nao usei redux. Eu conseguia passar funções dessa cena pra outra, mas nn consegui pensar em
+  //um jeito melhor de passar o callback do botão (talvez devesse ter usado um promisse?)
   _passClick(id){
     this.setState({
       buttonWasClicked:1,
       idButtonClicked:id,
   });
   }
-
   _getButtonState = ()=>{
     let button = this.state.buttonWasClicked;
     let id = this.state.idButtonClicked;
@@ -427,6 +452,10 @@ export default class App extends Component{
   return {clicked:button, id:id}
   }
 
+
+  //Aqui é confuso. Quando o cartão é jogado, ele analisa se o ultimo exame que foi selecionado (ou seja, vc escolheu eles com as setinhas e apertou estetoscopio)
+  //é o mesmo do card que vc jogou. Caso tenha sido, ele muda o checado desse exame pra true, e retorna o ˜resultado, que seria usado pra selecionar qual objeto/imagem
+  //será exibido sobre o QRcode. Não funciona muito bem assim nesse código, mas é o jeito certo de ser feito.
   _cardPlayed(type){
     //Tipos: 0 - Consulatorio, 1 - Audio, 2 - RaioX, 3 - Imagem, 4 - Sangue, 5 - Urina
     this.setState({
@@ -455,7 +484,10 @@ export default class App extends Component{
 
   }
 
-  //Roda ao clicar em algum exame
+  //Roda ao clicar em algum exame. vc seleciona com as setas, e ele reage conforme o selecionado.
+  //os mais basicos vão ter apenas um retorno em texto na tela azul, e seram marcados como "checados".
+  //O de audio tocaria... um audio, e marcaria como checado. Os de QR codes, falam qual cartao vc tem
+  //que mostrar, e só vao ser marcados como checados caso o cartao seja de fato usado
   async _clickExam(){
     let selectedId = this.state.selectedId;
     let indexExam = this.state.indexExam;
@@ -463,8 +495,7 @@ export default class App extends Component{
     //Retorno em texto
     if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==0){
       this.setState({
-        dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"],
-        
+        dialog:arvore[this.state.selectedId]['exames'][indexExam]["resultado"]
       });
       arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
     }
@@ -473,11 +504,8 @@ export default class App extends Component{
       if(this.state.selectedId==1 && indexExam==0){
         arvore[this.state.selectedId]['exames'][indexExam]["checado"]=true;
         this.setState({
-          dialog:"Auscultando",
-          playSound:true,
+          dialog:"Auscultando"
         });
-        // await soundObject.loadAsync(require('./js/res/heartbeat.mp3'));
-        // await soundObject.playAsync();
       }
     }
     else if (arvore[this.state.selectedId]['exames'][indexExam]['tipo']==2){
@@ -510,7 +538,10 @@ export default class App extends Component{
     }
   }
 
-  //Algoritmo de calculo dos pontos
+  //Algoritmo de calculo dos pontos. Pega o somatório de todos os possíveis pontos de precisão, pega quantos desses estão
+  //como checados, calcula a porcentagem relativa, e por fim, subtrai os exames laboratoriais (raio x, imagem, etc) com seus
+  //respectivos pesos associados. Também pega os que não estão checados E tem algum valor de precisão, pega o seus erros e coloca
+  //em uma lista pra exibir no final.
   _calculatePoints(){
       var precisionTotal = 0;
       var precisionAcquired = 0;
@@ -663,7 +694,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   centerExamText: {
-    color: 'black',
+    color: '#a9a9a9',
     fontWeight: 'normal',
     fontSize: 15,
   },

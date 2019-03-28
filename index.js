@@ -10,17 +10,8 @@ import {
   AppRegistry
 } from 'react-native';
 
-// let store = createStore(reducers);
 
-// export default class Root extends Component {
-//   render() {
-//     return (
-//       <Provider store={store}>
-//         <App />
-//       </Provider>
-//     )
-//   }
-// }
 
 AppRegistry.registerComponent(appName, () => App);
+//Para teste no Viro Media, precisa da linha seguuinte
 AppRegistry.registerComponent('ViroSample', () => App);
