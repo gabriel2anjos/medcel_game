@@ -5,7 +5,7 @@ import {StyleSheet} from 'react-native';
 
 import HitboxObject from './Component/HitboxObject';
 
-import {arvore} from './HitIds'
+import {arvore} from './tree'
 
 import {
   ViroARScene,
